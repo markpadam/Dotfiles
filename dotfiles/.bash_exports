@@ -1,0 +1,8 @@
+# ~/.bash_exports
+
+export DOTFILES="$HOME/.dotfiles"
+export PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+export EDITOR=vim
+export VISUAL=vim
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8

@@ -1,0 +1,22 @@
+[user]
+	name = Your Name
+	email = you@example.com
+
+[core]
+	editor = vim
+	autocrlf = input
+	excludesfile = ~/.gitignore_global
+
+[color]
+	ui = auto
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	df = diff
+	lg = log --oneline --graph --decorate --all
+
+[push]
+	default = simple
