@@ -1,6 +1,10 @@
-[user]
-	name = Your Name
-	email = you@example.com
+# Identity lives in ~/.gitconfig.local (not synced) so each machine — personal
+# Mac, work WSL — can use a different name/email. Example contents:
+#   [user]
+#       name = Mark Adam
+#       email = markpadam@hotmail.com
+[include]
+	path = ~/.gitconfig.local
 
 [core]
 	editor = vim

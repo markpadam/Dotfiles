@@ -28,21 +28,43 @@ fi
 
 echo "[*] Detected environment: $ENV"
 
-# Run installer
-bash "$DOTFILES/install/common.sh"
+# Run installer. common.sh is Linux-only (apt); macOS uses Homebrew in macos.sh.
+if [ "$ENV" != "macos" ]; then
+    bash "$DOTFILES/install/common.sh"
+fi
 bash "$DOTFILES/install/$ENV.sh"
 
-# Symlink dotfiles
+# Preserve the existing git identity before our .gitconfig symlink replaces it.
+# Our tracked .gitconfig includes ~/.gitconfig.local for per-machine identity.
+GITLOCAL="$HOME/.gitconfig.local"
+if [ ! -f "$GITLOCAL" ]; then
+    # Keep an existing identity if one is set; otherwise fall back to the
+    # personal default. Edit ~/.gitconfig.local on the work machine if needed.
+    GIT_NAME=$(git config --global user.name || true)
+    GIT_EMAIL=$(git config --global user.email || true)
+    [ -n "$GIT_NAME" ]  || GIT_NAME="Mark Adam"
+    [ -n "$GIT_EMAIL" ] || GIT_EMAIL="markpadam@hotmail.com"
+    echo "[*] Creating $GITLOCAL ($GIT_NAME <$GIT_EMAIL>)"
+    {
+        echo "[user]"
+        printf '\tname = %s\n'  "$GIT_NAME"
+        printf '\temail = %s\n' "$GIT_EMAIL"
+    } > "$GITLOCAL"
+fi
+
+# Symlink dotfiles, backing up any pre-existing real files first.
 echo "[*] Linking dotfiles..."
 for file in "$DOTFILES/dotfiles"/.*; do
     base=$(basename "$file")
     [[ "$base" == "." || "$base" == ".." ]] && continue
-    ln -sf "$file" "$HOME/$base"
+    target="$HOME/$base"
+    # If a real file/dir (not our symlink) is in the way, back it up once.
+    if [ -e "$target" ] && [ ! -L "$target" ]; then
+        echo "[*] Backing up existing $base -> $base.bak"
+        mv "$target" "$target.bak"
+    fi
+    ln -sf "$file" "$target"
 done
 
-# Ensure profile.d is loaded
-if ! grep -q "profile.d" "$HOME/.bashrc"; then
-    echo 'for f in $HOME/.dotfiles/profile.d/*.sh; do [ -r "$f" ] && source "$f"; done' >> "$HOME/.bashrc"
-fi
-
+# Our .bashrc and .zshrc already source profile.d, so nothing else to wire up.
 echo "[*] Done. Reload your shell."
