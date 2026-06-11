@@ -42,7 +42,12 @@ exec $SHELL
 - `.bash_functions`
 - `.tmux.conf`
 - `.vimrc` (classic vim fallback)
-- `.gitconfig`
+
+Git config is the one exception that is **not** symlinked: `~/.gitconfig` is a
+real per-machine file (created by `bootstrap.sh`) that `[include]`s the tracked
+`dotfiles/gitconfig.shared` plus `~/.gitconfig.local` (identity). This keeps
+git's own runtime writes (`safe.directory`, git-lfs filters) out of the tracked
+repo, so they can't dirty the tree and block `git pull`.
 
 Neovim/LazyVim is the default editor (`EDITOR=nvim`, `v` → `nvim`); classic
 `vim` stays installed as a fallback. The LazyVim config is **not** a home

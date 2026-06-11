@@ -1,0 +1,27 @@
+# Shared git config — included by ~/.gitconfig on every machine.
+#
+# This file is deliberately NOT symlinked to ~/.gitconfig. git writes its own
+# runtime settings (e.g. safe.directory, git-lfs filters) into ~/.gitconfig, so
+# if that path were a symlink into this repo every such write would dirty the
+# tracked tree and block bootstrap's `git pull`. Instead bootstrap creates a
+# real ~/.gitconfig that includes this file plus ~/.gitconfig.local (identity,
+# not synced — each machine sets its own name/email there).
+
+[core]
+	editor = nvim
+	autocrlf = input
+	excludesfile = ~/.gitignore_global
+
+[color]
+	ui = auto
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	df = diff
+	lg = log --oneline --graph --decorate --all
+
+[push]
+	default = simple

@@ -34,8 +34,7 @@ if [ "$ENV" != "macos" ]; then
 fi
 bash "$DOTFILES/install/$ENV.sh"
 
-# Preserve the existing git identity before our .gitconfig symlink replaces it.
-# Our tracked .gitconfig includes ~/.gitconfig.local for per-machine identity.
+# Per-machine git identity lives in ~/.gitconfig.local (not synced).
 GITLOCAL="$HOME/.gitconfig.local"
 if [ ! -f "$GITLOCAL" ]; then
     # Keep an existing identity if one is set; otherwise fall back to the
@@ -51,6 +50,29 @@ if [ ! -f "$GITLOCAL" ]; then
         printf '\temail = %s\n' "$GIT_EMAIL"
     } > "$GITLOCAL"
 fi
+
+# ~/.gitconfig is a REAL per-machine file (NOT a symlink), so git's own runtime
+# writes (safe.directory, git-lfs filters) stay out of the tracked repo. It just
+# includes the shared config + this machine's identity.
+GITCONFIG="$HOME/.gitconfig"
+GITSHARED="$DOTFILES/dotfiles/gitconfig.shared"
+if [ -L "$GITCONFIG" ]; then
+    # Migrate from the old symlinked-.gitconfig setup.
+    echo "[*] Replacing symlinked ~/.gitconfig with a real include file"
+    rm -f "$GITCONFIG"
+fi
+if [ ! -e "$GITCONFIG" ]; then
+    printf '[include]\n\tpath = %s\n[include]\n\tpath = %s\n' \
+        "$GITSHARED" "$GITLOCAL" > "$GITCONFIG"
+elif ! grep -qF "$GITSHARED" "$GITCONFIG"; then
+    # Real file already there (hand-made) — just prepend our include once,
+    # leaving any runtime settings git appended below it untouched.
+    echo "[*] Adding shared-config include to existing ~/.gitconfig"
+    printf '[include]\n\tpath = %s\n' "$GITSHARED" | cat - "$GITCONFIG" > "$GITCONFIG.tmp"
+    mv "$GITCONFIG.tmp" "$GITCONFIG"
+fi
+# Re-register the git-lfs filters in the new ~/.gitconfig if git-lfs is present.
+command -v git-lfs >/dev/null 2>&1 && git lfs install >/dev/null 2>&1 || true
 
 # Symlink dotfiles, backing up any pre-existing real files first.
 echo "[*] Linking dotfiles..."
