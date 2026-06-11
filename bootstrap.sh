@@ -12,7 +12,9 @@ if [ ! -d "$DOTFILES" ]; then
     git clone "$REPO" "$DOTFILES"
 else
     echo "[*] Updating Dotfiles repo..."
-    git -C "$DOTFILES" pull --rebase
+    # --autostash so per-machine tweaks (e.g. a custom PS1 in .zshrc) don't
+    # block the pull: git stashes them, rebases, then reapplies.
+    git -C "$DOTFILES" pull --rebase --autostash
 fi
 
 cd "$DOTFILES"
