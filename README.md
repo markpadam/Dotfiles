@@ -5,7 +5,7 @@ Personal dotfiles and bootstrap scripts for macOS, Ubuntu, and WSL.
 ## Repo structure
 
 - `bootstrap.sh` - clone/update and bootstrap the repo
-- `install/common.sh` - common installer for Linux deps + Kubernetes tooling (kubectl, helm, k9s, kubectx)
+- `install/common.sh` - common Linux/WSL installer: Kubernetes tooling (kubectl, helm, k9s, kubectx), neovim, and node
 - `install/ubuntu.sh` - Ubuntu-specific setup (own Docker daemon)
 - `install/wsl.sh` - WSL-specific setup (Docker Desktop backend)
 - `install/macos.sh` - macOS-specific setup (Homebrew)
@@ -57,7 +57,8 @@ and the multipass VM resolve the same plugins. `node` is installed too, since
 LazyVim's npm-based LSPs (e.g. `yaml-language-server` for k8s manifests) and
 Copilot need it.
 
-Git identity is **not** stored here. Create `~/.gitconfig.local` per machine:
+Git identity is **not** tracked here. `bootstrap.sh` creates `~/.gitconfig.local`
+with a default identity on first run; edit it per machine if needed:
 
 ```ini
 [user]
@@ -84,11 +85,18 @@ Git identity is **not** stored here. Create `~/.gitconfig.local` per machine:
 ## Notes
 
 - `bootstrap.sh` clones or updates the repo into `~/.dotfiles`
+- it is idempotent and safe to re-run; updates pull with `--autostash`, so
+  per-machine tweaks (e.g. a custom `PS1` in `.zshrc`) are kept across updates
 - dotfiles are symlinked into `~` (existing real files are backed up to `*.bak`)
 - `config/nvim` is symlinked to `~/.config/nvim` (existing real dir backed up to `nvim.bak`)
 - `.bashrc` and `.zshrc` source `profile.d/*.sh` directly
 - first `nvim` launch on a new machine bootstraps LazyVim plugins from `lazy-lock.json`
+- on macOS, bootstrap installs only **missing** Homebrew formulae — it won't
+  upgrade tools you already have (run `brew upgrade` yourself for that)
 
 ## Customization
 
-Edit files in `dotfiles/` and `profile.d/` to fit your workflow.
+Edit files in `dotfiles/` and `profile.d/` to fit your workflow. Keep
+machine-specific values out of the tracked files — identity goes in
+`~/.gitconfig.local`, and any local `.zshrc` edits survive re-runs via the
+bootstrap autostash.
