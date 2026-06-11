@@ -8,5 +8,5 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 brew update
-brew install git tmux vim fzf ripgrep jq kubectl helm k9s kubectx
+brew install git tmux vim neovim fzf ripgrep jq kubectl helm k9s kubectx
 brew install --cask --no-quarantine docker || true

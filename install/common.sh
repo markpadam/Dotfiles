@@ -6,7 +6,7 @@ set -euo pipefail
 
 sudo apt update
 sudo apt install -y \
-    git curl wget tmux vim fzf ripgrep jq \
+    git curl wget tmux vim fzf ripgrep jq unzip \
     ca-certificates gnupg lsb-release \
     build-essential \
     software-properties-common
@@ -48,4 +48,19 @@ if ! command -v kubectx >/dev/null 2>&1; then
     sudo curl -fsSL https://raw.githubusercontent.com/ahmetb/kubectx/master/kubectx -o /usr/local/bin/kubectx
     sudo curl -fsSL https://raw.githubusercontent.com/ahmetb/kubectx/master/kubens  -o /usr/local/bin/kubens
     sudo chmod +x /usr/local/bin/kubectx /usr/local/bin/kubens
+fi
+
+# neovim (for LazyVim). Distro packages lag behind what LazyVim needs, so use
+# the official release tarball — matches the recent nvim used on the Mac.
+case "$ARCH" in
+    arm64) NVARCH=arm64 ;;
+    *)     NVARCH=x86_64 ;;
+esac
+if ! command -v nvim >/dev/null 2>&1; then
+    echo "[*] Installing neovim ($NVARCH)..."
+    curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${NVARCH}.tar.gz" -o /tmp/nvim.tar.gz
+    sudo rm -rf "/opt/nvim-linux-${NVARCH}"
+    sudo tar -C /opt -xzf /tmp/nvim.tar.gz
+    sudo ln -sfn "/opt/nvim-linux-${NVARCH}/bin/nvim" /usr/local/bin/nvim
+    rm -f /tmp/nvim.tar.gz
 fi

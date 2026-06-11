@@ -66,5 +66,20 @@ for file in "$DOTFILES/dotfiles"/.*; do
     ln -sf "$file" "$target"
 done
 
+# Neovim / LazyVim config lives under ~/.config/nvim (not a dotfile in ~), so
+# it is symlinked separately. Same source of truth on Mac, multipass VM, WSL.
+NVIM_SRC="$DOTFILES/config/nvim"
+NVIM_DST="$HOME/.config/nvim"
+if [ -d "$NVIM_SRC" ]; then
+    mkdir -p "$HOME/.config"
+    # If a real dir (not our symlink) is in the way, back it up once.
+    if [ -e "$NVIM_DST" ] && [ ! -L "$NVIM_DST" ]; then
+        echo "[*] Backing up existing ~/.config/nvim -> nvim.bak"
+        rm -rf "$NVIM_DST.bak"
+        mv "$NVIM_DST" "$NVIM_DST.bak"
+    fi
+    ln -sfn "$NVIM_SRC" "$NVIM_DST"
+fi
+
 # Our .bashrc and .zshrc already source profile.d, so nothing else to wire up.
 echo "[*] Done. Reload your shell."
