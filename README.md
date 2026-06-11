@@ -48,7 +48,9 @@ Neovim/LazyVim is the default editor (`EDITOR=nvim`, `v` → `nvim`); classic
 `vim` stays installed as a fallback. The LazyVim config is **not** a home
 dotfile — it lives in `config/nvim/` and is symlinked to `~/.config/nvim` by
 `bootstrap.sh`. `config/nvim/lazy-lock.json` pins plugin versions so the Mac
-and the multipass VM resolve the same plugins.
+and the multipass VM resolve the same plugins. `node` is installed too, since
+LazyVim's npm-based LSPs (e.g. `yaml-language-server` for k8s manifests) and
+Copilot need it.
 
 Git identity is **not** stored here. Create `~/.gitconfig.local` per machine:
 

@@ -9,6 +9,7 @@ sudo apt install -y \
     git curl wget tmux vim fzf ripgrep jq unzip \
     ca-certificates gnupg lsb-release \
     build-essential \
+    nodejs npm \
     software-properties-common
 
 # Map dpkg arch -> the names used by k8s / k9s release artifacts.
