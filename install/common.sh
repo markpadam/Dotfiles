@@ -18,8 +18,9 @@ case "$(dpkg --print-architecture)" in
     *)     ARCH=amd64 ;;
 esac
 
-# kubectl
-if ! command -v kubectl >/dev/null 2>&1; then
+# kubectl — reinstall if missing OR not runnable (e.g. a stale x86 binary on an
+# arm VM, which `command -v` alone would not catch).
+if ! kubectl version --client >/dev/null 2>&1; then
     echo "[*] Installing kubectl ($ARCH)..."
     KVER="$(curl -L -s https://dl.k8s.io/release/stable.txt)"
     curl -fsSL "https://dl.k8s.io/release/${KVER}/bin/linux/${ARCH}/kubectl" -o /tmp/kubectl
