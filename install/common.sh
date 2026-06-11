@@ -9,7 +9,6 @@ sudo apt install -y \
     git curl wget tmux vim fzf ripgrep jq unzip \
     ca-certificates gnupg lsb-release \
     build-essential \
-    nodejs npm \
     software-properties-common
 
 # Map dpkg arch -> the names used by k8s / k9s release artifacts.
@@ -65,4 +64,13 @@ if ! command -v nvim >/dev/null 2>&1; then
     sudo tar -C /opt -xzf /tmp/nvim.tar.gz
     sudo ln -sfn "/opt/nvim-linux-${NVARCH}/bin/nvim" /usr/local/bin/nvim
     rm -f /tmp/nvim.tar.gz
+fi
+
+# node (for LazyVim's npm-based LSPs — yaml-language-server etc. — and Copilot).
+# Use NodeSource's single nodejs package, not Ubuntu's bloated node-* set which
+# pulls ~100 helper packages and is easy to run a small VM disk out of space on.
+if ! command -v node >/dev/null 2>&1; then
+    echo "[*] Installing node (NodeSource)..."
+    curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+    sudo apt-get install -y nodejs
 fi
