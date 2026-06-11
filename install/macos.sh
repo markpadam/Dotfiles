@@ -9,4 +9,4 @@ fi
 
 brew update
 brew install git tmux vim neovim node fzf ripgrep jq kubectl helm k9s kubectx
-brew install --cask --no-quarantine docker || true
+brew install --cask docker || true
