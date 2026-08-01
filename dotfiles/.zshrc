@@ -29,8 +29,15 @@ plugins=(
   zsh-syntax-highlighting
 )
 
-# oh-my-zsh runs compinit for us, so no manual compinit is needed below.
-source "$ZSH/oh-my-zsh.sh"
+# This file is shared with the multipass VM and WSL, where oh-my-zsh may not be
+# installed. Guard the load so those hosts still get a working shell: oh-my-zsh
+# runs compinit itself, so only run it ourselves in the fallback path.
+if [ -r "$ZSH/oh-my-zsh.sh" ]; then
+    source "$ZSH/oh-my-zsh.sh"
+else
+    autoload -Uz compinit && compinit
+    PS1='%n@%m:%~$ '
+fi
 
 # --- user environment and shared helpers (POSIX-clean, safe under zsh) ------
 # Sourced after oh-my-zsh so completion (compinit) is already initialised;
