@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# JankyBorders config. Reloaded on `brew services restart borders`.
+# Colors: Catppuccin Mocha (matches sketchybar).
+options=(
+	style=round
+	width=6.0
+	hidpi=off
+	active_color=0xffcba6f7    # mauve  — focused window
+	inactive_color=0xff45475a  # surface1 — unfocused windows
+)
+
+borders "${options[@]}"
