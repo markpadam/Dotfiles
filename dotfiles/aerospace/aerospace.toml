@@ -96,11 +96,21 @@ gaps.outer.right =      8
     ctrl-j = 'resize height +50'
 
     # --- splits: % = left/right, " = top/bottom (tmux defaults) ---
-    shift-5     = ['split horizontal', 'mode main']   # %  (split-window -h)
-    shift-quote = ['split vertical',   'mode main']   # "  (split-window -v)
+    # 'split' is a no-op with normalization enabled; set the container
+    # orientation instead so the next window lands where you expect.
+    shift-5     = ['layout tiles horizontal', 'mode main']   # %  (split-window -h)
+    shift-quote = ['layout tiles vertical',   'mode main']   # "  (split-window -v)
     # friendly aliases
-    backslash = ['split horizontal', 'mode main']     # \ (like |)
-    minus     = ['split vertical',   'mode main']     # -
+    backslash = ['layout tiles horizontal', 'mode main']     # \ (like |)
+    minus     = ['layout tiles vertical',   'mode main']     # -
+
+    # --- join-with: nest the focused window with its neighbour into a new
+    # container (the true "split just this pane off" move). Open the second
+    # window first, then join toward it. Stays in mode to chain joins.
+    alt-shift-h = 'join-with left'
+    alt-shift-j = 'join-with down'
+    alt-shift-k = 'join-with up'
+    alt-shift-l = 'join-with right'
 
     # --- zoom / close (tmux z / x) ---
     z = ['fullscreen',    'mode main']                # zoom pane
