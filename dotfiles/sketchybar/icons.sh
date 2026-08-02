@@ -28,4 +28,3 @@ export ICON_BATTERY_0=$'\xef\x89\x84'         # U+F244 battery-empty
 export ICON_BATTERY_CHARGING=$'\xef\x83\xa7'  # U+F0E7 bolt
 
 export ICON_CLOCK=$'\xef\x80\x97'             # U+F017 clock
-export ICON_CALENDAR=$'\xef\x84\xb3'          # U+F133 calendar

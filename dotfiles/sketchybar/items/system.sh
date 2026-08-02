@@ -15,9 +15,13 @@ sketchybar --add item battery right \
 	click_script="open -b com.apple.systempreferences /System/Library/PreferencePanes/Battery.prefPane" \
 	--subscribe battery power_source_change system_woke
 
+# brightness_change carries every deliberate change, so the poll is only a
+# backstop for ambient auto-brightness drifting the backlight with no event.
+# It was 30s, which meant the most expensive plugin here (~46ms of ioreg) ran
+# 120 times an hour to catch something that rarely happens.
 sketchybar --add item brightness right \
 	--set brightness \
-	update_freq=30 \
+	update_freq=300 \
 	icon="$ICON_BRIGHTNESS" \
 	icon.color="$YELLOW" \
 	script="$PLUGIN_DIR/brightness.sh" \
@@ -47,9 +51,11 @@ sketchybar --add item memory right \
 	script="$PLUGIN_DIR/memory.sh" \
 	click_script="open -a 'Activity Monitor'"
 
+# 5s rather than 3s: the plugin walks every process (~41ms) and a 2s coarser
+# refresh is not perceptible on a load readout.
 sketchybar --add item cpu right \
 	--set cpu \
-	update_freq=3 \
+	update_freq=5 \
 	icon="$ICON_CPU" \
 	icon.color="$MAUVE" \
 	icon.padding_left=10 \
