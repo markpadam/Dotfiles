@@ -95,9 +95,9 @@ done
 mkdir -p "$HOME/.config"
 
 echo "[*] Linking ~/.config entries..."
-# sketchybar and borders live under dotfiles/ (not config/) because that is
-# where the existing symlinks on this Mac already point.
-for name in sketchybar borders; do
+# sketchybar, borders, yabai and skhd live under dotfiles/ (not config/) because
+# that is where the existing symlinks on this Mac already point.
+for name in sketchybar borders yabai skhd; do
     [ -e "$DOTFILES/dotfiles/$name" ] && link "$DOTFILES/dotfiles/$name" "$HOME/.config/$name"
 done
 
