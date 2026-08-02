@@ -5,7 +5,7 @@
 # private-use-area codepoints, and plenty of tooling silently drops them when
 # rewriting a file. Escapes are plain ASCII, so they always survive.
 
-export ICON_APPLE=$'\xef\x85\xb9'             # U+F179 apple
+export ICON_DESKTOP=$'\xef\x84\x88'           # U+F108 desktop (show desktop)
 
 export ICON_CPU=$'\xef\x8b\x9b'               # U+F2DB microchip
 export ICON_MEMORY=$'\xf3\xb0\x8d\x9b'        # U+F035B md-memory (FA5 U+F538 is absent from Hack Nerd Font)

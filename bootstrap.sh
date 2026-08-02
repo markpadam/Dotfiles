@@ -1,46 +1,45 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+# Restore this Mac's setup from the repo. Safe to re-run: every step is
+# idempotent, installs are additive, and any real file already in the way is
+# backed up to <name>.bak before a symlink replaces it.
 
 REPO="https://github.com/markpadam/Dotfiles.git"
 DOTFILES="$HOME/.dotfiles"
+export DOTFILES
 
 echo "[*] Bootstrapping Dotfiles..."
 
-# Clone or update repo
 if [ ! -d "$DOTFILES" ]; then
     echo "[*] Cloning Dotfiles repo..."
     git clone "$REPO" "$DOTFILES"
 else
     echo "[*] Updating Dotfiles repo..."
-    # --autostash so per-machine tweaks (e.g. a custom PS1 in .zshrc) don't
-    # block the pull: git stashes them, rebases, then reapplies.
+    # --autostash so per-machine tweaks don't block the pull: git stashes them,
+    # rebases, then reapplies.
     git -C "$DOTFILES" pull --rebase --autostash
 fi
 
-cd "$DOTFILES"
-
-# Detect environment
-if grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
-    ENV="wsl"
-elif [ "$(uname)" = "Darwin" ]; then
-    ENV="macos"
+if [ "$(uname)" != "Darwin" ]; then
+    echo "[!] This repo is a macOS backup; package restore is macOS-only."
+    echo "[!] Continuing with symlinks only."
+    MACOS=0
 else
-    ENV="ubuntu"
+    MACOS=1
 fi
 
-echo "[*] Detected environment: $ENV"
-
-# Run installer. common.sh is Linux-only (apt); macOS uses Homebrew in macos.sh.
-if [ "$ENV" != "macos" ]; then
-    bash "$DOTFILES/install/common.sh"
+# --- packages ---------------------------------------------------------------
+if [ "$MACOS" = "1" ]; then
+    bash "$DOTFILES/install/macos.sh"
+    bash "$DOTFILES/install/shell.sh"
 fi
-bash "$DOTFILES/install/$ENV.sh"
 
-# Per-machine git identity lives in ~/.gitconfig.local (not synced).
+# --- git identity -----------------------------------------------------------
+# Per-machine identity lives in ~/.gitconfig.local and is deliberately NOT
+# tracked, so a work machine can differ without dirtying the repo.
 GITLOCAL="$HOME/.gitconfig.local"
 if [ ! -f "$GITLOCAL" ]; then
-    # Keep an existing identity if one is set; otherwise fall back to the
-    # personal default. Edit ~/.gitconfig.local on the work machine if needed.
     GIT_NAME=$(git config --global user.name || true)
     GIT_EMAIL=$(git config --global user.email || true)
     [ -n "$GIT_NAME" ]  || GIT_NAME="Mark Adam"
@@ -59,7 +58,6 @@ fi
 GITCONFIG="$HOME/.gitconfig"
 GITSHARED="$DOTFILES/dotfiles/gitconfig.shared"
 if [ -L "$GITCONFIG" ]; then
-    # Migrate from the old symlinked-.gitconfig setup.
     echo "[*] Replacing symlinked ~/.gitconfig with a real include file"
     rm -f "$GITCONFIG"
 fi
@@ -67,43 +65,74 @@ if [ ! -e "$GITCONFIG" ]; then
     printf '[include]\n\tpath = %s\n[include]\n\tpath = %s\n' \
         "$GITSHARED" "$GITLOCAL" > "$GITCONFIG"
 elif ! grep -qF "$GITSHARED" "$GITCONFIG"; then
-    # Real file already there (hand-made) — just prepend our include once,
-    # leaving any runtime settings git appended below it untouched.
     echo "[*] Adding shared-config include to existing ~/.gitconfig"
     printf '[include]\n\tpath = %s\n' "$GITSHARED" | cat - "$GITCONFIG" > "$GITCONFIG.tmp"
     mv "$GITCONFIG.tmp" "$GITCONFIG"
 fi
-# Re-register the git-lfs filters in the new ~/.gitconfig if git-lfs is present.
 command -v git-lfs >/dev/null 2>&1 && git lfs install >/dev/null 2>&1 || true
 
-# Symlink dotfiles, backing up any pre-existing real files first.
-echo "[*] Linking dotfiles..."
+# --- symlink helper ---------------------------------------------------------
+# Backs up a pre-existing real file/dir once, then points target at source.
+link() {
+    local src="$1" dst="$2"
+    if [ -e "$dst" ] && [ ! -L "$dst" ]; then
+        echo "[*] Backing up existing $(basename "$dst") -> $(basename "$dst").bak"
+        rm -rf "$dst.bak"
+        mv "$dst" "$dst.bak"
+    fi
+    ln -sfn "$src" "$dst"
+}
+
+# --- home dotfiles ----------------------------------------------------------
+echo "[*] Linking dotfiles into \$HOME..."
 for file in "$DOTFILES/dotfiles"/.*; do
     base=$(basename "$file")
     [[ "$base" == "." || "$base" == ".." ]] && continue
-    target="$HOME/$base"
-    # If a real file/dir (not our symlink) is in the way, back it up once.
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
-        echo "[*] Backing up existing $base -> $base.bak"
-        mv "$target" "$target.bak"
-    fi
-    ln -sf "$file" "$target"
+    link "$file" "$HOME/$base"
 done
 
-# Neovim / LazyVim config lives under ~/.config/nvim (not a dotfile in ~), so
-# it is symlinked separately. Same source of truth on Mac, multipass VM, WSL.
-NVIM_SRC="$DOTFILES/config/nvim"
-NVIM_DST="$HOME/.config/nvim"
-if [ -d "$NVIM_SRC" ]; then
-    mkdir -p "$HOME/.config"
-    # If a real dir (not our symlink) is in the way, back it up once.
-    if [ -e "$NVIM_DST" ] && [ ! -L "$NVIM_DST" ]; then
-        echo "[*] Backing up existing ~/.config/nvim -> nvim.bak"
-        rm -rf "$NVIM_DST.bak"
-        mv "$NVIM_DST" "$NVIM_DST.bak"
+# --- ~/.config --------------------------------------------------------------
+mkdir -p "$HOME/.config"
+
+echo "[*] Linking ~/.config entries..."
+# sketchybar and borders live under dotfiles/ (not config/) because that is
+# where the existing symlinks on this Mac already point.
+for name in sketchybar borders; do
+    [ -e "$DOTFILES/dotfiles/$name" ] && link "$DOTFILES/dotfiles/$name" "$HOME/.config/$name"
+done
+
+for src in "$DOTFILES/config"/*; do
+    [ -e "$src" ] || continue
+    link "$src" "$HOME/.config/$(basename "$src")"
+done
+
+# --- snapshot-only configs --------------------------------------------------
+# These apps rewrite their own config at runtime, so they are copied rather than
+# symlinked — a symlink would let the app commit its runtime state (and, for gh,
+# potentially an auth token) straight into this public repo.
+echo "[*] Restoring snapshot configs (copy, not symlink)..."
+for src in "$DOTFILES/snapshots"/*; do
+    [ -d "$src" ] || continue
+    name=$(basename "$src")
+    dst="$HOME/.config/$name"
+    if [ -e "$dst" ]; then
+        echo "    skipping $name (already present — not overwriting live config)"
+    else
+        cp -R "$src" "$dst"
+        echo "    restored $name"
     fi
-    ln -sfn "$NVIM_SRC" "$NVIM_DST"
+done
+
+# --- VS Code ----------------------------------------------------------------
+[ "$MACOS" = "1" ] && bash "$DOTFILES/install/vscode.sh"
+
+# --- macOS defaults ---------------------------------------------------------
+# Not run automatically: it restarts Dock/Finder and changes system appearance,
+# which is rude to do behind someone's back on an already-configured machine.
+if [ "$MACOS" = "1" ]; then
+    echo
+    echo "[*] To apply macOS system preferences, run:"
+    echo "      bash $DOTFILES/macos/defaults.sh"
 fi
 
-# Our .bashrc and .zshrc already source profile.d, so nothing else to wire up.
 echo "[*] Done. Reload your shell."

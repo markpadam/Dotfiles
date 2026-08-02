@@ -1,2 +1,14 @@
 .DS_Store
 **/.DS_Store
+
+# This repo is PUBLIC. Never track machine-local identity, credentials or
+# runtime auth state, even if something copies them in by accident.
+.gitconfig.local
+snapshots/gh/hosts.yml
+**/auth.db*
+**/*.key
+**/*.pem
+**/.env
+**/*credentials*
+**/*secret*
+**/.vault-token
