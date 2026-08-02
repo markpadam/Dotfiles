@@ -31,9 +31,18 @@ if ! pgrep -xq DesktopRenamer; then
 	exit 1
 fi
 
-# `get all spaces` returns one record per line as ID~Name~DisplayID~Num.
-# Quoting the whole thing keeps the newlines; osascript would otherwise be
-# indistinguishable from a single-line result.
+# `get all spaces` returns one record per line. The bundled sdef documents the
+# format as ID~Name~DisplayID~Num, but 1.13.2 actually emits six fields:
+#
+#   1~Desktop 1~Built-in Retina Display~1~0~
+#   ^ ^         ^                       ^ ^
+#   | name      display *name*, not an  | undocumented, always 0 here;
+#   ID         ID as the sdef claims    ordinal   then a trailing empty field
+#
+# So the read below takes five variables and lets `rest` absorb the tail. With
+# only four, bash would assign the whole remainder to `num` ("1~0~") and the
+# arithmetic below would abort the script. Five keeps it working if the app
+# grows further fields, which the sdef drift suggests it might.
 spaces=$(osascript -e 'tell application "DesktopRenamer" to get all spaces')
 
 if [ -z "$spaces" ]; then
@@ -55,9 +64,9 @@ if [ -z "$display" ]; then
 fi
 
 planned=0
-while IFS='~' read -r id name display_id num; do
+while IFS='~' read -r id name row_display num rest; do
 	[ -n "${num:-}" ] || continue
-	[ "$display_id" = "$display" ] || continue
+	[ "$row_display" = "$display" ] || continue
 
 	want=${NAMES[num - 1]:-}
 	[ -n "$want" ] || continue
