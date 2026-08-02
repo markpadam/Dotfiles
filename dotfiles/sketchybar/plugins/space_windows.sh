@@ -19,11 +19,18 @@ source "$CONFIG_DIR/icon_map.sh"
 sid="$(jq -r '.space' <<<"$INFO")"
 [ -z "$sid" ] || [ "$sid" = "null" ] && exit 0
 
+# Apps that keep a window on every single space, so drawing them says nothing
+# about what is actually on a desktop. DesktopRenamer parks an on-desktop label
+# window on each one; before it was installed every space here looked empty and
+# after it every space carried a stray :default: icon.
+IGNORE_APPS="DesktopRenamer"
+
 # keys[] is sorted and de-duplicated, so icon order stays stable as windows
 # come and go rather than jumping around on every event.
 icon_strip=""
 while read -r app; do
 	[ -z "$app" ] && continue
+	grep -qxF "$app" <<<"$IGNORE_APPS" && continue
 	__icon_map "$app"
 	icon_strip+="${icon_strip:+ }${icon_result}"
 done <<<"$(jq -r '.apps | keys[]' <<<"$INFO")"
