@@ -32,7 +32,7 @@ bash ~/.dotfiles/macos/defaults.sh
 | Path | What it is |
 |---|---|
 | `bootstrap.sh` | Entry point — clone/update, install, link |
-| `Brewfile` | 8 taps, 43 formulae, 10 casks, 2 npm globals |
+| `Brewfile` | 9 taps, 43 formulae, 12 casks, 2 npm globals |
 | `install/macos.sh` | `brew bundle install` wrapper |
 | `install/shell.sh` | oh-my-zsh, powerlevel10k, zsh plugins |
 | `install/vscode.sh` | Reinstalls VS Code extensions |
