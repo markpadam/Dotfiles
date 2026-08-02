@@ -42,6 +42,7 @@ bash ~/.dotfiles/macos/defaults.sh
 | `snapshots/` | Configs restored by **copy**, never symlinked |
 | `profile.d/` | Shared shell helpers, sourced by `.zshrc`/`.bashrc` |
 | `packages/` | VS Code extension list |
+| `raycast/scripts/` | Raycast Script Commands — add the directory in Raycast |
 
 ### `dotfiles/` → `~`
 
