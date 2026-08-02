@@ -17,6 +17,10 @@ defaults write com.apple.dock orientation -string "left"
 defaults write com.apple.dock tilesize -int 35
 # Minimise windows into their app icon rather than a separate Dock tile.
 defaults write com.apple.dock minimize-to-application -bool true
+# Stop Mission Control reordering desktops by recency. Ctrl+1..9, the sketchybar
+# space islands and yabai's --space N are all *positional*, so with reordering on
+# the numbers drift apart from the desktops and silently stop meaning anything.
+defaults write com.apple.dock mru-spaces -bool false
 
 # --- Finder -----------------------------------------------------------------
 # icnv = icon view. Others: Nlsv (list), clmv (column), glyv (gallery).
