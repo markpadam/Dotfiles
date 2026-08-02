@@ -1,3 +1,4 @@
+tap "asmvik/formulae"
 tap "derailed/k9s"
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "fluxcd/tap"
@@ -81,6 +82,10 @@ brew "zsh-autocomplete"
 brew "zsh-autosuggestions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+# Simple hotkey-daemon for macOS.
+brew "asmvik/formulae/skhd", trusted: true
+# A tiling window manager for macOS based on binary space partitioning.
+brew "asmvik/formulae/yabai", trusted: true
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
 # Custom macOS statusbar with shell plugin, interaction and graph support

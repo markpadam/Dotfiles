@@ -32,7 +32,7 @@ bash ~/.dotfiles/macos/defaults.sh
 | Path | What it is |
 |---|---|
 | `bootstrap.sh` | Entry point — clone/update, install, link |
-| `Brewfile` | 7 taps, 41 formulae, 10 casks, 2 npm globals |
+| `Brewfile` | 8 taps, 43 formulae, 10 casks, 2 npm globals |
 | `install/macos.sh` | `brew bundle install` wrapper |
 | `install/shell.sh` | oh-my-zsh, powerlevel10k, zsh plugins |
 | `install/vscode.sh` | Reinstalls VS Code extensions |
@@ -48,9 +48,14 @@ bash ~/.dotfiles/macos/defaults.sh
 `.zshrc` `.bashrc` `.bash_aliases` `.bash_exports` `.bash_functions` `.vimrc`
 `.tmux.conf` `.p10k.zsh` `gitconfig.shared`
 
-`sketchybar/` and `borders/` also live here (rather than under `config/`) and
-are linked to `~/.config/` — that is where this Mac's existing symlinks already
-point, and moving them would break a working machine.
+`sketchybar/`, `borders/`, `yabai/` and `skhd/` also live here (rather than
+under `config/`) and are linked to `~/.config/` — that is where this Mac's
+existing symlinks already point, and moving them would break a working machine.
+
+`yabai` and `skhd` both need Accessibility permission granted by hand the first
+time (System Settings → Privacy & Security → Accessibility) before
+`brew services start` will do anything useful, so bootstrap installs them but
+does not start them.
 
 ### `config/` → `~/.config`
 
