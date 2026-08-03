@@ -17,9 +17,9 @@ defaults write com.apple.dock orientation -string "left"
 defaults write com.apple.dock tilesize -int 35
 # Minimise windows into their app icon rather than a separate Dock tile.
 defaults write com.apple.dock minimize-to-application -bool true
-# Stop Mission Control reordering desktops by recency. Ctrl+1..9, the sketchybar
-# space islands and yabai's --space N are all *positional*, so with reordering on
-# the numbers drift apart from the desktops and silently stop meaning anything.
+# Stop Mission Control reordering desktops by recency. Ctrl+1..9 and the
+# sketchybar space islands are both *positional*, so with reordering on the
+# numbers drift apart from the desktops and silently stop meaning anything.
 defaults write com.apple.dock mru-spaces -bool false
 
 # --- Finder -----------------------------------------------------------------
@@ -71,9 +71,11 @@ hotkey 127 true 48 29 262144   # Desktop 10
 # collides with skhd's float toggle on the same chord.
 hotkey 61 false 32 49 786432
 
-# Cmd+Space, Spotlight. Disabled because Raycast is bound to it instead. Note
-# Opt+Cmd+Space (id 65, Finder search window) is deliberately left alone.
-hotkey 64 false 32 49 1048576
+# Cmd+Space, Spotlight. Enabled. Raycast used to own this chord; its own hotkey
+# has to be cleared or moved in Raycast's own settings, because a Raycast global
+# hotkey wins over the system one while Raycast is running. Note Opt+Cmd+Space
+# (id 65, Finder search window) is deliberately left alone.
+hotkey 64 true 32 49 1048576
 
 # --- Apply ------------------------------------------------------------------
 # Dock and Finder only re-read their prefs on restart. AppleInterfaceStyle needs

@@ -49,14 +49,13 @@ bash ~/.dotfiles/macos/defaults.sh
 `.zshrc` `.bashrc` `.bash_aliases` `.bash_exports` `.bash_functions` `.vimrc`
 `.tmux.conf` `.p10k.zsh` `gitconfig.shared`
 
-`sketchybar/`, `borders/`, `yabai/` and `skhd/` also live here (rather than
-under `config/`) and are linked to `~/.config/` — that is where this Mac's
-existing symlinks already point, and moving them would break a working machine.
+`sketchybar/` and `borders/` also live here (rather than under `config/`) and
+are linked to `~/.config/` — that is where this Mac's existing symlinks already
+point, and moving them would break a working machine.
 
-`yabai` and `skhd` both need Accessibility permission granted by hand the first
-time (System Settings → Privacy & Security → Accessibility) before
-`brew services start` will do anything useful, so bootstrap installs them but
-does not start them.
+`sketchybar` needs Accessibility permission granted by hand the first time
+(System Settings → Privacy & Security → Accessibility) before
+`brew services start` will do anything useful.
 
 ### `config/` → `~/.config`
 
