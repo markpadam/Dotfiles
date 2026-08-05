@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # JankyBorders config. Reloaded on `brew services restart borders`.
-# Colors: Catppuccin Mocha (matches sketchybar).
+# Colors: Catppuccin Mocha (matches the shell prompt / terminal theme).
 options=(
 	style=round
 	width=4.0
 	# On this Retina display hidpi=off draws the border at 1x and then scales
-	# it, which reads soft next to the bar. On renders at native resolution.
+	# it, which reads soft. On renders at native resolution.
 	hidpi=on
 	active_color=0xffcba6f7    # mauve  — focused window
 	inactive_color=0xff45475a  # surface1 — unfocused windows

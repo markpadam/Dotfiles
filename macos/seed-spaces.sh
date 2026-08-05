@@ -16,10 +16,11 @@ set -euo pipefail
 # Control's recency reordering left on, the ordinals shuffle and this script
 # would rename the wrong desktops.
 #
-# This does NOT create desktops. macOS exposes no scriptable way to add one
-# without yabai's scripting addition (which needs SIP partially disabled, and
-# this setup deliberately keeps SIP fully on). Add them by hand in Mission
-# Control first; any name here with no matching desktop is simply skipped.
+# This does NOT create desktops. macOS exposes no scriptable way to add one.
+# The only tool that could was yabai's scripting addition, which needs SIP
+# partially disabled; yabai was removed on 2026-08-05 and SIP stays fully on
+# either way. Add desktops by hand in Mission Control first; any name here with
+# no matching desktop is simply skipped.
 
 NAMES=(Term Web Lab Notes Comms)
 

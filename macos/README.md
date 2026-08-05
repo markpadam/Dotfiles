@@ -45,19 +45,21 @@ next login. `defaults.sh` calls it at the end of the section:
 ### Notable bindings
 
 - **Ctrl+1..0 → Desktop 1..10** are wired up for all ten even though only five
-  desktops exist, so adding a sixth needs no shortcut work. These are
-  **load-bearing for SketchyBar**, not just a convenience: clicking a space pill
-  synthesises the matching Ctrl+n. Turn them off and the islands still draw but
-  stop responding to clicks, with nothing obvious to blame.
-- **Cmd+Space (id 64) is enabled — Spotlight.** Raycast used to own this chord and
-  id 64 was disabled for it; that was reversed on 2026-08-03. Raycast's own hotkey
-  has to be cleared or moved **in Raycast's settings**, because it registers a
-  global monitor that wins over the system shortcut while it runs, and the binding
-  is not in its plist, so it cannot be automated.
+  desktops exist, so adding a sixth needs no shortcut work. With no hotkey daemon
+  in the setup these **are** the desktop-switching keys, not a convenience layer
+  on top of one — turn them off and you are left with Ctrl+arrows and Mission
+  Control. (They were also what SketchyBar's space pills synthesised when
+  clicked, before the bar was removed on 2026-08-04.)
+- **Cmd+Space (id 64) is enabled — Spotlight, and now uncontested.** Raycast used
+  to own this chord and id 64 was disabled for it; that was reversed on 2026-08-03,
+  and Raycast itself was removed on 2026-08-05. The old caveat about clearing
+  Raycast's own global hotkey in its settings no longer applies.
 - **Ctrl+Opt+Space (id 61) is disabled.** It was unbound because it collided with
-  skhd's float toggle. skhd was removed on 2026-08-03 but 61 was deliberately left
-  disabled — re-enabling it changes input behaviour, so it is a deliberate choice
-  rather than a leftover.
+  skhd's float toggle. skhd went on 2026-08-03 and yabai on 2026-08-05, so nothing
+  claims the chord now — but 61 is still deliberately left disabled, because
+  flipping it back changes *input* behaviour rather than window behaviour. It is a
+  standing choice, not a leftover from the window-manager teardown. With one input
+  source installed it is a no-op either way.
 - **Opt+Cmd+Space (id 65) is untouched** — still the Finder search window.
 
 ### Unverified shortcuts
@@ -121,11 +123,12 @@ display *name* ("Built-in Retina Display"), not an ID. With `IFS='~'` and four
 arrives as `1~0~` and any arithmetic on it aborts the script. Read five and let the
 last absorb the tail.
 
-**Automation permission is granted per calling binary, so SketchyBar cannot use
-AppleScript here.** The identical `osascript` call returns the name from a terminal
-and returns empty when SketchyBar runs it — silently, no error, because SketchyBar
-is a brew-managed daemon that never reliably gets the consent prompt. Don't call
-AppleScript from a background service.
+**Automation permission is granted per calling binary, so a brew-managed daemon
+cannot use AppleScript here.** Found via SketchyBar (removed 2026-08-04), but the
+rule is general: the identical `osascript` call returned the name from a terminal
+and returned empty when the daemon ran it — silently, no error, because a
+background service never reliably gets the consent prompt. Don't call AppleScript
+from one.
 
 **Read the plist instead.** `~/Library/Preferences/com.michaelqiu.DesktopRenamer.plist`,
 key `com.michaelqiu.desktoprenamer.indexcache` — a base64 JSON blob keyed
@@ -137,12 +140,13 @@ AppleEvent round trip, and it still works with the app quit. Escape the dots or
 plutil -extract 'com\.michaelqiu\.desktoprenamer\.indexcache' raw -o - "$PLIST" | base64 -d | jq .
 ```
 
-It is an undocumented internal key, so treat it as best-effort — the space pill
-falls back to its digit on any failure.
+It is an undocumented internal key, so treat it as best-effort and always give any
+consumer a fallback.
 
-**It parks a window on every desktop** (its on-desktop label windows). SketchyBar's
-per-space app icons therefore showed a stray `:default:` icon on all five pills,
-including the empty ones, until `space_windows.sh` filtered it out via `IGNORE_APPS`.
+**It parks a window on every desktop** (its on-desktop label windows), so anything
+enumerating windows per space sees a phantom entry on every one, including empty
+desktops. This bit SketchyBar's per-space app icons and needed an explicit ignore
+list; worth knowing before writing any other per-space window query.
 
 ### Useful AppleScript
 

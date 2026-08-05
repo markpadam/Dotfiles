@@ -31,12 +31,13 @@ inactive_color=0xff45475a   # surface1 — unfocused
 ## Width is centred on the window frame
 
 The stroke straddles the frame edge, so it reaches about **half** its width
-outward. At `width=6.0` it stuck out roughly 3pt and met the bottom of the
-SketchyBar islands; `4.0` reaches about 1.5pt and leaves a clear gap.
+outward. At `width=6.0` it stuck out roughly 3pt — enough to collide with what
+was then a 28pt status bar at the top of the screen; `4.0` reaches about 1.5pt.
 
-Worth remembering when the bar and the borders look like they are touching — it is
-usually the border closing the gap, not the bar. It is also why bar overlap is
-never fixed by nudging SketchyBar's `y_offset`: the borders swallow the gain.
+Worth remembering whenever a border looks like it is touching something it
+should not be: it is usually the border reaching outward, not the other element
+being mispositioned. Adjusting the *other* thing's offset never helped, because
+the borders just swallowed the gain.
 
 ## Run / restart
 
