@@ -32,7 +32,7 @@ bash ~/.dotfiles/macos/defaults.sh
 | Path | What it is |
 |---|---|
 | `bootstrap.sh` | Entry point — clone/update, install, link |
-| `Brewfile` | 9 taps, 43 formulae, 12 casks, 2 npm globals |
+| `Brewfile` | 9 taps, 41 formulae, 11 casks, 2 npm globals |
 | `install/macos.sh` | `brew bundle install` wrapper |
 | `install/shell.sh` | oh-my-zsh, powerlevel10k, zsh plugins |
 | `install/vscode.sh` | Reinstalls VS Code extensions |
@@ -42,29 +42,31 @@ bash ~/.dotfiles/macos/defaults.sh
 | `snapshots/` | Configs restored by **copy**, never symlinked |
 | `profile.d/` | Shared shell helpers, sourced by `.zshrc`/`.bashrc` |
 | `packages/` | VS Code extension list |
-| `raycast/scripts/` | Raycast Script Commands, linked to `~/Documents/Raycast Scripts` |
 
 ### `dotfiles/` → `~`
 
 `.zshrc` `.bashrc` `.bash_aliases` `.bash_exports` `.bash_functions` `.vimrc`
 `.tmux.conf` `.p10k.zsh` `gitconfig.shared`
 
-`sketchybar/` and `borders/` also live here (rather than under `config/`) and
-are linked to `~/.config/` — that is where this Mac's existing symlinks already
-point, and moving them would break a working machine.
+`borders/` also lives here (rather than under `config/`) and is linked to
+`~/.config/` — that is where this Mac's existing symlink already points, and
+moving it would break a working machine.
 
-`sketchybar` needs Accessibility permission granted by hand the first time
-(System Settings → Privacy & Security → Accessibility) before
-`brew services start` will do anything useful.
+There were `sketchybar/` and `yabai/` here too, plus a top-level `raycast/`.
+SketchyBar went on 4 August 2026 in favour of the stock macOS menu bar; yabai
+and Raycast went on 5 August 2026, returning window management to stock macOS
+entirely. JankyBorders is all that remains of the stack. Every config is
+recoverable from git history if it is ever wanted back.
 
 ### `config/` → `~/.config`
 
 `nvim/` (LazyVim) · `fish/` · `powershell/` · `git/` · `AutoRaise/` ·
 `starship.toml`
 
-`AutoRaise` needs the same by-hand Accessibility grant as `sketchybar`, and
-macOS pins that grant to the **versioned Cellar path** — so a `brew upgrade`
-silently revokes it. See `config/AutoRaise/README.md`.
+`AutoRaise` needs an Accessibility grant made by hand the first time (System
+Settings → Privacy & Security → Accessibility) before `brew services start`
+does anything useful. macOS pins that grant to the **versioned Cellar path**,
+so a `brew upgrade` silently revokes it. See `config/AutoRaise/README.md`.
 
 ### `snapshots/` → copied, not linked
 

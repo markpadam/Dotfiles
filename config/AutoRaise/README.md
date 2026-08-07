@@ -44,7 +44,7 @@ keeps running and does nothing at all.
 
 After any upgrade, re-add it in System Settings → Privacy & Security →
 Accessibility (`+`, then Cmd+Shift+G and paste the new path) and remove the stale
-entry. Same trap applies to `borders` and `sketchybar`.
+entry. The same trap applies to `borders`.
 
 The same thing catches a fresh install for a different reason: the command-line
 build runs headless under `launchd`, so it never triggers a permission prompt.

@@ -17,9 +17,9 @@ defaults write com.apple.dock orientation -string "left"
 defaults write com.apple.dock tilesize -int 35
 # Minimise windows into their app icon rather than a separate Dock tile.
 defaults write com.apple.dock minimize-to-application -bool true
-# Stop Mission Control reordering desktops by recency. Ctrl+1..9 and the
-# sketchybar space islands are both *positional*, so with reordering on the
-# numbers drift apart from the desktops and silently stop meaning anything.
+# Stop Mission Control reordering desktops by recency. Ctrl+1..9 are
+# *positional*, so with reordering on the numbers drift apart from the desktops
+# they are meant to select and silently stop meaning anything.
 defaults write com.apple.dock mru-spaces -bool false
 
 # --- Finder -----------------------------------------------------------------
@@ -53,8 +53,9 @@ hotkey() { # hotkey <id> <enabled true|false> <ascii> <keycode> <modifiers>
 }
 
 # Ctrl+1..0 switch to Desktop 1..10 (ids 118-127). Off by default beyond the
-# first few. These are load-bearing for the SketchyBar space pills: clicking one
-# synthesises the matching Ctrl+n, so without these the islands do nothing.
+# first few. With no hotkey daemon in the setup these ARE the desktop-switching
+# keys -- Ctrl+1..5 is how you move between Term/Web/Lab/Notes/Comms, so turning
+# them off leaves only Ctrl+arrows and Mission Control.
 # Note the keycodes are not sequential -- 5 and 6 are swapped, as are 7 and 8.
 hotkey 118 true 49 18 262144   # Desktop 1
 hotkey 119 true 50 19 262144   # Desktop 2
@@ -67,14 +68,18 @@ hotkey 125 true 56 28 262144   # Desktop 8
 hotkey 126 true 57 25 262144   # Desktop 9
 hotkey 127 true 48 29 262144   # Desktop 10
 
-# Ctrl+Opt+Space, "Select next source in Input menu". Disabled because it
-# collides with skhd's float toggle on the same chord.
+# Ctrl+Opt+Space, "Select next source in Input menu". Disabled originally
+# because it collided with skhd's float toggle on the same chord. skhd went on
+# 3 August 2026 and yabai on the 5th, so nothing claims the chord any more —
+# this is now just a stock macOS shortcut left switched off on purpose. Flipping
+# it back to `true` changes input behaviour rather than window behaviour, which
+# is why it was not swept up with the window-manager removal. With a single
+# input source installed it would be a no-op either way.
 hotkey 61 false 32 49 786432
 
-# Cmd+Space, Spotlight. Enabled. Raycast used to own this chord; its own hotkey
-# has to be cleared or moved in Raycast's own settings, because a Raycast global
-# hotkey wins over the system one while Raycast is running. Note Opt+Cmd+Space
-# (id 65, Finder search window) is deliberately left alone.
+# Cmd+Space, Spotlight. Enabled — and now uncontested: Raycast owned this chord
+# until it was removed on 5 August 2026. Note Opt+Cmd+Space (id 65, Finder
+# search window) is deliberately left alone.
 hotkey 64 true 32 49 1048576
 
 # --- Apply ------------------------------------------------------------------

@@ -88,8 +88,6 @@ brew "zsh-syntax-highlighting"
 brew "dimentium/autoraise/autoraise"
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
-# Custom macOS statusbar with shell plugin, interaction and graph support
-brew "felixkratz/formulae/sketchybar", trusted: true
 # CLI for Apple Notes via private NotesShared framework
 brew "johnmatthewtennant/tap/notekit-cli", trusted: true
 # Brings the power of Copilot coding agent directly to your terminal
@@ -99,14 +97,11 @@ cask "gitmichaelqiu/tap/desktoprenamer", trusted: true
 # Screen colour temperature controller
 cask "flux-app"
 cask "font-hack-nerd-font"
-cask "font-sketchybar-app-font"
 # Markdown editor
 cask "mark-text"
 # Orchestrates virtual Ubuntu instances
 cask "multipass"
 cask "powershell"
-# Control your tools with a few keystrokes
-cask "raycast"
 # --- casks present in /opt/homebrew/Caskroom but missed by `brew bundle dump` ---
 # Their install receipts are out of sync with the cask definitions, so dump
 # skips them. They are genuinely installed here, so pin them explicitly.
