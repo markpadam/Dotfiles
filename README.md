@@ -59,7 +59,12 @@ point, and moving them would break a working machine.
 
 ### `config/` → `~/.config`
 
-`nvim/` (LazyVim) · `fish/` · `powershell/` · `git/` · `starship.toml`
+`nvim/` (LazyVim) · `fish/` · `powershell/` · `git/` · `AutoRaise/` ·
+`starship.toml`
+
+`AutoRaise` needs the same by-hand Accessibility grant as `sketchybar`, and
+macOS pins that grant to the **versioned Cellar path** — so a `brew upgrade`
+silently revokes it. See `config/AutoRaise/README.md`.
 
 ### `snapshots/` → copied, not linked
 

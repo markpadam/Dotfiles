@@ -1,5 +1,6 @@
 tap "asmvik/formulae"
 tap "derailed/k9s"
+tap "dimentium/autoraise"
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "fluxcd/tap"
 tap "gitmichaelqiu/tap"
@@ -83,6 +84,8 @@ brew "zsh-autocomplete"
 brew "zsh-autosuggestions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+# Focus follows mouse for macOS
+brew "dimentium/autoraise/autoraise"
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
 # Custom macOS statusbar with shell plugin, interaction and graph support

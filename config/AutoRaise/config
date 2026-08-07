@@ -1,0 +1,18 @@
+#AutoRaise config file
+# Full option list: https://github.com/sbmpost/AutoRaise#running-autoraise
+# These values match AutoRaise's built-in defaults - tweak freely.
+
+# How often the mouse position is polled, in ms. Min 20.
+pollMillis=50
+
+# Raise delay in units of pollMillis. 0 = never raise (focus only).
+delay=1
+
+# Wait for the mouse to stop moving before focusing/raising.
+requireMouseStop=true
+
+# Hold this key to temporarily suspend AutoRaise. control|option|disabled
+disableKey=control
+
+# Apps to leave alone entirely, e.g.
+# ignoreApps="Alfred,zoom.us"
