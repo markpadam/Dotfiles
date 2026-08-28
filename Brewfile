@@ -88,6 +88,8 @@ brew "zsh-syntax-highlighting"
 brew "dimentium/autoraise/autoraise"
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
+# Highly customizable macOS status bar
+brew "felixkratz/formulae/sketchybar", trusted: true
 # CLI for Apple Notes via private NotesShared framework
 brew "johnmatthewtennant/tap/notekit-cli", trusted: true
 # Brings the power of Copilot coding agent directly to your terminal
@@ -101,6 +103,7 @@ cask "karabiner-elements"
 # Screen colour temperature controller
 cask "flux-app"
 cask "font-hack-nerd-font"
+cask "font-sketchybar-app-font"
 # Markdown editor
 cask "mark-text"
 # Orchestrates virtual Ubuntu instances

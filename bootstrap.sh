@@ -95,9 +95,9 @@ done
 mkdir -p "$HOME/.config"
 
 echo "[*] Linking ~/.config entries..."
-# borders and aerospace live under dotfiles/ (not config/) because that is
-# where the existing symlink on this Mac already points.
-for name in borders aerospace; do
+# borders, aerospace and sketchybar live under dotfiles/ (not config/)
+# because that is where the existing symlink on this Mac already points.
+for name in borders aerospace sketchybar; do
     [ -e "$DOTFILES/dotfiles/$name" ] && link "$DOTFILES/dotfiles/$name" "$HOME/.config/$name"
 done
 
