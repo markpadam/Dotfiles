@@ -32,7 +32,7 @@ bash ~/.dotfiles/macos/defaults.sh
 | Path | What it is |
 |---|---|
 | `bootstrap.sh` | Entry point — clone/update, install, link |
-| `Brewfile` | 9 taps, 41 formulae, 11 casks, 2 npm globals |
+| `Brewfile` | 10 taps, 43 formulae, 14 casks, 2 npm globals |
 | `install/macos.sh` | `brew bundle install` wrapper |
 | `install/shell.sh` | oh-my-zsh, powerlevel10k, zsh plugins |
 | `install/vscode.sh` | Reinstalls VS Code extensions |
@@ -48,15 +48,34 @@ bash ~/.dotfiles/macos/defaults.sh
 `.zshrc` `.bashrc` `.bash_aliases` `.bash_exports` `.bash_functions` `.vimrc`
 `.tmux.conf` `.p10k.zsh` `gitconfig.shared`
 
-`borders/` also lives here (rather than under `config/`) and is linked to
-`~/.config/` — that is where this Mac's existing symlink already points, and
-moving it would break a working machine.
+`borders/`, `aerospace/` and `sketchybar/` also live here (rather than under
+`config/`) and are linked to `~/.config/` — that is where this Mac's existing
+symlinks already point, and moving them would break a working machine.
 
-There were `sketchybar/` and `yabai/` here too, plus a top-level `raycast/`.
-SketchyBar went on 4 August 2026 in favour of the stock macOS menu bar; yabai
-and Raycast went on 5 August 2026, returning window management to stock macOS
-entirely. JankyBorders is all that remains of the stack. Every config is
-recoverable from git history if it is ever wanted back.
+## Window management
+
+**Omarchy-style keyboard-driven tiling**, added back on 28 August 2026 after
+an earlier stock-macOS period (4-5 August 2026, when SketchyBar, yabai and
+Raycast were all torn out — see git history around `554451c` if that state
+is ever wanted back). The current stack:
+
+- **AeroSpace** (`dotfiles/aerospace/aerospace.toml`) — tiling window manager,
+  5 workspaces (`term`/`web`/`lab`/`notes`/`comms`) with app-routing rules and
+  a resize mode (no mouse-drag resize, by design).
+- **Karabiner-Elements** (`snapshots/karabiner/`) — remaps Caps Lock to a
+  Ctrl+Option hyper key (hold) / Escape (tap), driving every AeroSpace
+  binding. Copied, not symlinked — see `snapshots/` below.
+- **SketchyBar** (`dotfiles/sketchybar/`) — status bar; its workspace pills
+  track AeroSpace's `exec-on-workspace-change` hook directly, not native
+  macOS Spaces (which this setup collapses to one per display — see
+  `aerospace.toml`'s header comment and `dotfiles/sketchybar/README.md`).
+- **Raycast** (`raycast/scripts/`) — launcher; Script Commands only, restored
+  from git history (`a12c1ef`).
+- **JankyBorders** — unchanged throughout every prior teardown/rebuild.
+
+Hotkey binding (Raycast) and Accessibility/Input Monitoring grants
+(AeroSpace, Karabiner) are manual GUI steps that `bootstrap.sh` cannot do —
+macOS requires a human click for both.
 
 ### `config/` → `~/.config`
 
@@ -70,13 +89,15 @@ so a `brew upgrade` silently revokes it. See `config/AutoRaise/README.md`.
 
 ### `snapshots/` → copied, not linked
 
-`gh/` · `qBittorrent/` · `NuGet/`
+`gh/` · `qBittorrent/` · `NuGet/` · `karabiner/`
 
 These apps rewrite their own config files at runtime. Symlinking them into a
 public git repo would let the app commit its runtime state — and in `gh`'s case
 potentially an auth token — straight into version control. `bootstrap.sh` copies
 them only when no live config already exists, so it never clobbers a
-working setup.
+working setup. `karabiner/karabiner.json` is the Caps Lock hyper-key remap
+that drives AeroSpace's bindings — Karabiner rewrites this file constantly
+(device IDs, UI state), so it belongs here for the same reason `gh` does.
 
 ## The shell
 
