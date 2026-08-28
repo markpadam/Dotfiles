@@ -94,6 +94,10 @@ brew "johnmatthewtennant/tap/notekit-cli", trusted: true
 cask "copilot-cli"
 # Rename macOS Desktops/Spaces from the menubar
 cask "gitmichaelqiu/tap/desktoprenamer", trusted: true
+# i3-like tiling window manager for macOS
+cask "nikitabobko/tap/aerospace", trusted: true
+# Remaps Caps Lock to a hyper key (hold) / Escape (tap) for AeroSpace bindings
+cask "karabiner-elements"
 # Screen colour temperature controller
 cask "flux-app"
 cask "font-hack-nerd-font"
