@@ -76,6 +76,8 @@ brew "tmux"
 brew "vim"
 # Sends magic packets to wake up network-devices
 brew "wakeonlan"
+# Send scripted macOS notifications from the command line
+brew "terminal-notifier"
 # UNIX shell (command interpreter)
 brew "zsh"
 # Real-time type-ahead completion for Zsh
@@ -109,6 +111,7 @@ cask "mark-text"
 # Orchestrates virtual Ubuntu instances
 cask "multipass"
 cask "powershell"
+cask "raycast"
 # --- casks present in /opt/homebrew/Caskroom but missed by `brew bundle dump` ---
 # Their install receipts are out of sync with the cask definitions, so dump
 # skips them. They are genuinely installed here, so pin them explicitly.
