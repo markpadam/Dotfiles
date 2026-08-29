@@ -45,11 +45,11 @@ next login. `defaults.sh` calls it at the end of the section:
 ### Notable bindings
 
 - **Ctrl+1..0 → Desktop 1..10** are wired up for all ten even though only five
-  desktops exist, so adding a sixth needs no shortcut work. With no hotkey daemon
-  in the setup these **are** the desktop-switching keys, not a convenience layer
-  on top of one — turn them off and you are left with Ctrl+arrows and Mission
-  Control. (They were also what SketchyBar's space pills synthesised when
-  clicked, before the bar was removed on 2026-08-04.)
+  desktops exist, so adding a sixth needs no shortcut work. Left as-is since
+  AeroSpace was added on 2026-08-28 (see below) — not removed, just no longer
+  the primary way to switch. (SketchyBar's current workspace pills call
+  `aerospace workspace <name>` directly, not these — a change from the old
+  bar, which synthesised Ctrl+N on click before it was removed on 2026-08-04.)
 - **Cmd+Space (id 64) is enabled — Spotlight, and now uncontested.** Raycast used
   to own this chord and id 64 was disabled for it; that was reversed on 2026-08-03,
   and Raycast itself was removed on 2026-08-05. The old caveat about clearing
@@ -70,6 +70,14 @@ could be confirmed on this machine — the display one has no entry in
 `com.apple.symbolichotkeys` at all. Treat both as unverified.
 
 ## Mission Control desktops
+
+**AeroSpace (`dotfiles/aerospace/aerospace.toml`) now owns desktop-style
+switching day to day** — its own workspaces, not these. This section is kept
+because DesktopRenamer and the seeding below are not removed, just no longer
+the primary path: AeroSpace's setup wants "Displays have separate Spaces"
+off and Mission Control collapsed to one desktop per display, which leaves
+nothing left for the ordinals below to distinguish. If that is ever reverted,
+everything here still applies unchanged.
 
 Five desktops, named by DesktopRenamer:
 
