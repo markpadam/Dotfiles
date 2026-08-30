@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
-# Summing per-process %CPU and dividing by thread count is cheap and
-# instantaneous — `top -l 2` would be more accurate but blocks for a second.
+# Show CPU usage percentage with color-coded Nerd Font icon.
 
-source "$CONFIG_DIR/colors.sh"
+CPU=$(top -l 1 -n 0 | awk '/CPU usage/ {gsub(/%/,""); print int($3 + $5)}')
 
-THREADS=$(sysctl -n machdep.cpu.thread_count)
-LOAD=$(ps -A -o %cpu | awk -v t="$THREADS" '{s += $1} END {printf "%.0f", s / t}')
-
-if [ "$LOAD" -gt 80 ]; then
-	COLOR="$RED"
-elif [ "$LOAD" -gt 50 ]; then
-	COLOR="$PEACH"
-elif [ "$LOAD" -gt 25 ]; then
-	COLOR="$YELLOW"
+if [ "$CPU" -ge 80 ]; then
+    COLOR=0xfff38ba8   # red
+elif [ "$CPU" -ge 50 ]; then
+    COLOR=0xfff9e2af   # yellow
 else
-	COLOR="$MAUVE"
+    COLOR=0xffa6e3a1   # green
 fi
 
-sketchybar --set "$NAME" icon.color="$COLOR" label="${LOAD}%"
+sketchybar --set "$NAME" icon.color="$COLOR" label="${CPU}%"
