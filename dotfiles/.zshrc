@@ -2,16 +2,13 @@
 # macOS defaults to zsh. We reuse the same shared helpers as bash so the
 # terminal behaves identically across the Mac, the multipass VM, and WSL.
 
-# --- powerlevel10k instant prompt -------------------------------------------
-# Must stay near the top of ~/.zshrc. Anything that prints to the console before
-# this line (or before oh-my-zsh loads) will disable instant prompt.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # --- oh-my-zsh --------------------------------------------------------------
 export ZSH="$HOME/.oh-my-zsh"
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# The prompt comes from Starship (see the Omachy-managed block at the end of
+# this file), so oh-my-zsh loads no theme of its own. Leaving this empty also
+# means nothing here prints to the console before oh-my-zsh, which is why the
+# old powerlevel10k instant-prompt preamble is gone.
+ZSH_THEME=""
 
 # DevOps stack: kube/helm/flux/terraform/azure completions + aliases.
 # NOTE: zsh-syntax-highlighting must remain the LAST entry in this list.
@@ -51,12 +48,22 @@ for f in "$HOME/.dotfiles/profile.d/"*.sh; do
     [ -r "$f" ] && source "$f"
 done
 
+# --- mise (Node/Python/Go/Rust toolchain manager) ----------------------------
+command -v mise >/dev/null && eval "$(mise activate zsh)"
+
 # --- history ----------------------------------------------------------------
 setopt append_history share_history hist_ignore_all_dups
 HISTSIZE=10000
 SAVEHIST=20000
 HISTFILE="$HOME/.zsh_history"
 
-# --- powerlevel10k prompt config --------------------------------------------
-# To reconfigure the look/segments interactively, run: p10k configure
-[[ ! -f "$HOME/.p10k.zsh" ]] || source "$HOME/.p10k.zsh"
+# ── Omachy managed (do not edit between these markers) ──
+# zsh-syntax-highlighting and zsh-autosuggestions are already loaded by the
+# oh-my-zsh plugin list above, so they are not re-sourced here.
+eval "$(starship init zsh)"
+eval "$(fzf --zsh)"
+eval "$(atuin init zsh)"
+set -o vi
+fastfetch
+dev() { sh ~/.config/omachy/dev-session.sh "$@"; }
+# ── End Omachy managed ──

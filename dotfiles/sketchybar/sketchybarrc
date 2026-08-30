@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# SketchyBar — Catppuccin Mocha, "floating islands" layout.
+#
+# The bar itself is fully transparent and offset from the top edge; each group
+# of items is wrapped in a bracket that paints its own rounded surface0 pill.
+#
+# Nothing is placed in the centre position on purpose: that is where the notch
+# sits, and sketchybar has no notch-aware layout option, so the only reliable
+# way to avoid drawing under it is to leave the middle empty.
+#
+# Reload with: sketchybar --reload   (or `brew services restart sketchybar`)
+
+export CONFIG_DIR="$HOME/.config/sketchybar"
+export PLUGIN_DIR="$CONFIG_DIR/plugins"
+export ITEM_DIR="$CONFIG_DIR/items"
+
+source "$CONFIG_DIR/colors.sh"
+source "$CONFIG_DIR/icons.sh"
+
+export FONT="Hack Nerd Font"
+export APP_FONT="sketchybar-app-font"
+
+##### Bar #####
+# height=28 matches the real macOS menu bar exactly: on this notched display
+# NSScreen safeAreaInsets.top is 28pt, and no window may be placed above that
+# line, so a 28pt bar at y_offset=0 sits entirely inside the reserved strip and
+# can never overlap a window. (NSStatusBar thickness reports 22, but that is the
+# legacy status-item height, not the bar; AX reports 29, including its 1pt edge.)
+#
+# The 26pt brackets leave 1pt of breathing room above and below inside that strip.
+# margin insets the islands from the sides. topmost=window keeps the bar above
+# app windows but still *below* the real menu bar, so the menu bar slides over it
+# when you hover the top.
+sketchybar --bar \
+	position=top \
+	height=28 \
+	y_offset=0 \
+	margin=10 \
+	padding_left=0 \
+	padding_right=0 \
+	color="$BAR_COLOR" \
+	corner_radius=0 \
+	border_width=0 \
+	blur_radius=0 \
+	shadow=off \
+	sticky=on \
+	topmost=window \
+	font_smoothing=on
+
+##### Item defaults #####
+default=(
+	updates=when_shown
+	icon.font="$FONT:Bold:14.0"
+	icon.color="$ITEM_COLOR"
+	icon.padding_left=8
+	icon.padding_right=4
+	label.font="$FONT:Bold:12.0"
+	label.color="$ITEM_COLOR"
+	label.padding_left=0
+	label.padding_right=8
+	background.height=26
+	background.corner_radius=8
+	background.drawing=off
+	padding_left=2
+	padding_right=2
+)
+sketchybar --default "${default[@]}"
+
+##### Items #####
+source "$ITEM_DIR/workspaces.sh"
+source "$ITEM_DIR/front_app.sh"
+# Right-hand items stack right-to-left in the order they are added, so the
+# clock must come first to stay pinned to the far right.
+source "$ITEM_DIR/clock.sh"
+source "$ITEM_DIR/system.sh"
+
+##### Finalise #####
+sketchybar --hotload on
+sketchybar --update
+
+echo "sketchybar configuration loaded"

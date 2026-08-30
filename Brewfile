@@ -68,6 +68,10 @@ brew "rbenv"
 brew "restic"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Polyglot runtime/toolchain manager (Node, Python, Go, Rust, ...)
+brew "mise"
+# Generates a colour palette from an image/wallpaper for theming
+brew "chenrui333/tap/wallust", trusted: true
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Terminal multiplexer
@@ -76,6 +80,8 @@ brew "tmux"
 brew "vim"
 # Sends magic packets to wake up network-devices
 brew "wakeonlan"
+# Send scripted macOS notifications from the command line
+brew "terminal-notifier"
 # UNIX shell (command interpreter)
 brew "zsh"
 # Real-time type-ahead completion for Zsh
@@ -88,20 +94,30 @@ brew "zsh-syntax-highlighting"
 brew "dimentium/autoraise/autoraise"
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
+# Highly customizable macOS status bar
+brew "felixkratz/formulae/sketchybar", trusted: true
 # CLI for Apple Notes via private NotesShared framework
 brew "johnmatthewtennant/tap/notekit-cli", trusted: true
 # Brings the power of Copilot coding agent directly to your terminal
 cask "copilot-cli"
 # Rename macOS Desktops/Spaces from the menubar
 cask "gitmichaelqiu/tap/desktoprenamer", trusted: true
+# i3-like tiling window manager for macOS
+cask "nikitabobko/tap/aerospace", trusted: true
+# Remaps Caps Lock to a hyper key (hold) / Escape (tap) for AeroSpace bindings
+cask "karabiner-elements"
 # Screen colour temperature controller
 cask "flux-app"
 cask "font-hack-nerd-font"
+cask "font-sketchybar-app-font"
 # Markdown editor
 cask "mark-text"
 # Orchestrates virtual Ubuntu instances
 cask "multipass"
 cask "powershell"
+cask "raycast"
+# GPU-accelerated terminal emulator
+cask "wezterm"
 # --- casks present in /opt/homebrew/Caskroom but missed by `brew bundle dump` ---
 # Their install receipts are out of sync with the cask definitions, so dump
 # skips them. They are genuinely installed here, so pin them explicitly.
