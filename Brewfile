@@ -68,6 +68,10 @@ brew "rbenv"
 brew "restic"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
+# Polyglot runtime/toolchain manager (Node, Python, Go, Rust, ...)
+brew "mise"
+# Generates a colour palette from an image/wallpaper for theming
+brew "chenrui333/tap/wallust", trusted: true
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Terminal multiplexer
@@ -112,6 +116,8 @@ cask "mark-text"
 cask "multipass"
 cask "powershell"
 cask "raycast"
+# GPU-accelerated terminal emulator
+cask "wezterm"
 # --- casks present in /opt/homebrew/Caskroom but missed by `brew bundle dump` ---
 # Their install receipts are out of sync with the cask definitions, so dump
 # skips them. They are genuinely installed here, so pin them explicitly.

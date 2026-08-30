@@ -1,0 +1,10 @@
+# ~/.config/mise/config.toml
+
+[tools]
+node = "lts"
+python = "3.12"
+go = "latest"
+rust = "stable"
+
+[settings]
+experimental = true

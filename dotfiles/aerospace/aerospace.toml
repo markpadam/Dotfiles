@@ -1,147 +1,144 @@
-# AeroSpace config — Omarchy-style keyboard-driven tiling.
-# Symlinked to ~/.config/aerospace/aerospace.toml by bootstrap.sh.
-#
-# Modifier: Karabiner-Elements remaps Caps Lock (held) -> Ctrl+Option, used
-# below as ctrl-alt. See ~/.dotfiles/snapshots/karabiner/karabiner.json.
-# Caps Lock tapped alone sends Escape instead (vim-friendly, unrelated to
-# AeroSpace).
-#
-# Workspace names mirror the old DesktopRenamer macOS Spaces (term/web/lab/
-# notes/comms) — AeroSpace workspaces now own that job. "Displays have
-# separate Spaces" should be OFF in System Settings > Desktop & Dock (manual,
-# GUI-only) for correct cross-monitor behavior; Mission Control collapses
-# back to one Space per display and DesktopRenamer/hotkeys 118-127 go dormant.
-
 config-version = 2
+
+# Modifier: Karabiner-Elements remaps Caps Lock (held) -> Ctrl+Option, used
+# below as `ctrl-alt`. Caps Lock tapped alone sends Escape. If you change the
+# prefix here, change ~/.config/karabiner/karabiner.json to match or the
+# shortcuts stop working.
+
+# ── Startup ──────────────────────────────────────────────────────────────────
+after-startup-command = [
+    'exec-and-forget sketchybar',
+    'exec-and-forget borders active_color="glow(0xff00ffaa)" inactive_color=0xff313244 width=6.0',
+]
 
 start-at-login = true
 automatically-unhide-macos-hidden-apps = true
 
+# ── Layout defaults ───────────────────────────────────────────────────────────
+accordion-padding = 30
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
-# Notify SketchyBar of workspace changes. Guarded with `command -v` so this
-# is a silent no-op until SketchyBar is installed in a later phase. Must be
-# a top-level key — AeroSpace rejects it if it ends up nested under a table
-# header like [exec] or [gaps] (TOML applies key=value to whatever table
-# header precedes it, so this has to come before any of those).
+# ── Tree normalizations ───────────────────────────────────────────────────────
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# ── Mouse follows focus ───────────────────────────────────────────────────────
+on-focused-monitor-changed = []
+on-focus-changed = []
+
+# ── Sketchybar integration ────────────────────────────────────────────────────
 exec-on-workspace-change = ['/bin/bash', '-c',
-    'command -v sketchybar >/dev/null && sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
 ]
 
-# Bar-clearance not yet tuned against SketchyBar (installed in a later
-# phase) — these are a starting point, not a measured value. Revisit once
-# SketchyBar is running, on both the built-in display and docked to the DELL.
+# ── Key mapping ───────────────────────────────────────────────────────────────
+[key-mapping]
+    preset = 'qwerty'
+
+# ── Gaps (Hyprland-style breathing room) ─────────────────────────────────────
 [gaps]
-inner.horizontal = 8
-inner.vertical = 8
-outer.left = 8
-outer.right = 8
-outer.bottom = 8
-outer.top = 8
+    inner.horizontal = 8
+    inner.vertical   = 8
+    outer.left       = 8
+    outer.bottom     = 8
+    # Must clear the sketchybar: y_offset (4) + height (36) + shadow/breathing room.
+    # 16 left the bar's translucent, blurred lower edge sitting on top of window headers.
+    outer.top        = 48
+    outer.right      = 8
 
-[exec]
-inherit-env-vars = true
+# ── Window rules ──────────────────────────────────────────────────────────────
+[[on-window-detected]]
+    if.app-id = 'com.apple.systempreferences'
+    run = 'layout floating'
 
+[[on-window-detected]]
+    if.app-id = 'com.apple.calculator'
+    run = 'layout floating'
 
+# ── Main keybindings ──────────────────────────────────────────────────────────
+# `ctrl-alt` = the Caps Lock hyper key (see note at top of file).
 [mode.main.binding]
-# Focus
-ctrl-alt-h = 'focus left'
-ctrl-alt-j = 'focus down'
-ctrl-alt-k = 'focus up'
-ctrl-alt-l = 'focus right'
+    # Focus (vim-style)
+    ctrl-alt-h = 'focus left'
+    ctrl-alt-j = 'focus down'
+    ctrl-alt-k = 'focus up'
+    ctrl-alt-l = 'focus right'
 
-# Move window
-ctrl-alt-shift-h = 'move left'
-ctrl-alt-shift-j = 'move down'
-ctrl-alt-shift-k = 'move up'
-ctrl-alt-shift-l = 'move right'
+    # Move windows (vim-style)
+    ctrl-alt-shift-h = 'move left'
+    ctrl-alt-shift-j = 'move down'
+    ctrl-alt-shift-k = 'move up'
+    ctrl-alt-shift-l = 'move right'
 
-# Layout
-ctrl-alt-slash = 'layout tiles horizontal vertical'
-ctrl-alt-comma = 'layout accordion horizontal vertical'
-ctrl-alt-f = 'fullscreen'
-ctrl-alt-shift-space = 'layout floating tiling'
+    # Resize
+    ctrl-alt-minus = 'resize smart -50'
+    ctrl-alt-equal = 'resize smart +50'
 
-# Resize mode (no mouse-drag resize in AeroSpace by design — this is the
-# standard workaround: enter a mode, resize with hjkl, esc/enter to leave)
-ctrl-alt-r = 'mode resize'
+    # Layout toggles
+    ctrl-alt-slash       = 'layout tiles horizontal vertical'
+    ctrl-alt-comma       = 'layout accordion horizontal vertical'
+    ctrl-alt-shift-space = 'layout floating tiling'
+    ctrl-alt-f           = 'macos-native-fullscreen'
 
-# Workspaces — term/web/lab/notes/comms, matching the old 5-desktop naming
-ctrl-alt-1 = 'workspace term'
-ctrl-alt-2 = 'workspace web'
-ctrl-alt-3 = 'workspace lab'
-ctrl-alt-4 = 'workspace notes'
-ctrl-alt-5 = 'workspace comms'
-ctrl-alt-shift-1 = 'move-node-to-workspace term'
-ctrl-alt-shift-2 = 'move-node-to-workspace web'
-ctrl-alt-shift-3 = 'move-node-to-workspace lab'
-ctrl-alt-shift-4 = 'move-node-to-workspace notes'
-ctrl-alt-shift-5 = 'move-node-to-workspace comms'
+    # Workspace switching (number-based)
+    ctrl-alt-1 = 'workspace 1'
+    ctrl-alt-2 = 'workspace 2'
+    ctrl-alt-3 = 'workspace 3'
+    ctrl-alt-4 = 'workspace 4'
+    ctrl-alt-5 = 'workspace 5'
+    ctrl-alt-6 = 'workspace 6'
+    ctrl-alt-7 = 'workspace 7'
+    ctrl-alt-8 = 'workspace 8'
+    ctrl-alt-9 = 'workspace 9'
 
-ctrl-alt-enter = 'exec-and-forget open -na iTerm'
-ctrl-alt-shift-r = 'reload-config'
+    # Move window to workspace
+    ctrl-alt-shift-1 = 'move-node-to-workspace 1'
+    ctrl-alt-shift-2 = 'move-node-to-workspace 2'
+    ctrl-alt-shift-3 = 'move-node-to-workspace 3'
+    ctrl-alt-shift-4 = 'move-node-to-workspace 4'
+    ctrl-alt-shift-5 = 'move-node-to-workspace 5'
+    ctrl-alt-shift-6 = 'move-node-to-workspace 6'
+    ctrl-alt-shift-7 = 'move-node-to-workspace 7'
+    ctrl-alt-shift-8 = 'move-node-to-workspace 8'
+    ctrl-alt-shift-9 = 'move-node-to-workspace 9'
 
+    # Workspace navigation
+    ctrl-alt-tab       = 'workspace-back-and-forth'
+    ctrl-alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
+
+    # Window management
+    ctrl-alt-q     = 'close'
+    ctrl-alt-enter = 'exec-and-forget osascript -e "tell application \"Ghostty\" to new window"'
+
+    # Mode switching
+    ctrl-alt-shift-semicolon = 'mode service'
+    ctrl-alt-r               = 'mode resize'
+
+    # Disable accidental macOS app hide shortcuts
+    cmd-h     = []
+    cmd-alt-h = []
+
+# ── Service mode ──────────────────────────────────────────────────────────────
+[mode.service.binding]
+    esc       = ['reload-config', 'mode main']
+    r         = ['flatten-workspace-tree', 'mode main']
+    f         = ['layout floating tiling', 'mode main']
+    backspace = ['close-all-windows-but-current', 'mode main']
+
+    # Join windows into a container
+    ctrl-alt-shift-h = ['join-with left',  'mode main']
+    ctrl-alt-shift-j = ['join-with down',  'mode main']
+    ctrl-alt-shift-k = ['join-with up',    'mode main']
+    ctrl-alt-shift-l = ['join-with right', 'mode main']
+
+# ── Resize mode ───────────────────────────────────────────────────────────────
 [mode.resize.binding]
-h = 'resize width -50'
-l = 'resize width +50'
-j = 'resize height +50'
-k = 'resize height -50'
-enter = 'mode main'
-esc = 'mode main'
-
-# App routing. Bundle IDs for iTerm2/Safari/Notes/Messages/Mail/Finder are
-# well-known; the rest use a name substring instead of guessing an ID wrong.
-# If a rule doesn't fire, run `aerospace list-apps` to get the exact app-id
-# and swap it in — don't assume these are all correct un-tested.
-[[on-window-detected]]
-if.app-id = 'com.googlecode.iterm2'
-run = 'move-node-to-workspace term'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.Safari'
-run = 'move-node-to-workspace web'
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Brave'
-run = 'move-node-to-workspace web'
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Freelens'
-run = 'move-node-to-workspace lab'
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Headlamp'
-run = 'move-node-to-workspace lab'
-
-[[on-window-detected]]
-if.app-name-regex-substring = 'Postman'
-run = 'move-node-to-workspace lab'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.Notes'
-run = 'move-node-to-workspace notes'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.MobileSMS'
-run = 'move-node-to-workspace comms'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.mail'
-run = 'move-node-to-workspace comms'
-
-# Confirmed installed via `aerospace list-apps` — the comms app actually in
-# use, not just Messages/Mail.
-[[on-window-detected]]
-if.app-id = 'net.whatsapp.WhatsApp'
-run = 'move-node-to-workspace comms'
-
-# Doesn't tile well — float it instead of forcing it into the grid.
-[[on-window-detected]]
-if.app-name-regex-substring = 'System Settings'
-run = 'layout floating'
-
-[[on-window-detected]]
-if.app-id = 'com.apple.finder'
-if.window-title-regex-substring = '^(?!Desktop$).*'
-run = 'layout floating'
+    h     = 'resize width -50'
+    j     = 'resize height +50'
+    k     = 'resize height -50'
+    l     = 'resize width +50'
+    minus = 'resize smart -50'
+    equal = 'resize smart +50'
+    enter = 'mode main'
+    esc   = 'mode main'
