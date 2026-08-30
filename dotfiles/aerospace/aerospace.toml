@@ -42,9 +42,13 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     inner.vertical   = 8
     outer.left       = 8
     outer.bottom     = 8
-    # Must clear the sketchybar: y_offset (4) + height (36) + shadow/breathing room.
-    # 16 left the bar's translucent, blurred lower edge sitting on top of window headers.
-    outer.top        = 48
+    # Uniform 8pt gap all round. The sketchybar's bottom edge (y_offset 2 +
+    # height 24 = 26pt) now sits entirely inside the 28pt notch safe area that
+    # macOS already reserves, so it no longer intrudes into the tiling region
+    # and the top gap needs no extra bar-clearance allowance. Windows start at
+    # safeArea(28) + 8 = 36pt, ~10pt clear of the bar. If the bar ever grows
+    # past 26pt again, bump this back up to (bar-bottom − 28 + 8).
+    outer.top        = 8
     outer.right      = 8
 
 # ── Window rules ──────────────────────────────────────────────────────────────

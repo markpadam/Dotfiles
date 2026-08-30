@@ -14,10 +14,10 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 # ── Bar appearance ────────────────────────────────────────────────────────────
 sketchybar --bar \
     position=top          \
-    height=36             \
+    height=24             \
     margin=8              \
-    y_offset=4            \
-    corner_radius=10      \
+    y_offset=2            \
+    corner_radius=8       \
     blur_radius=20        \
     color=0xcc1e1e2e      \
     border_width=1        \
@@ -31,8 +31,8 @@ sketchybar --bar \
 sketchybar --default \
     padding_left=4                              \
     padding_right=4                             \
-    icon.font="HackNerdFont-Bold:Bold:15.0"     \
-    label.font="HackNerdFont-Bold:Bold:13.0"    \
+    icon.font="HackNerdFont-Bold:Bold:13.0"     \
+    label.font="HackNerdFont-Bold:Bold:12.0"    \
     icon.color=0xffcdd6f4                       \
     label.color=0xffcdd6f4                      \
     icon.padding_left=6                         \
@@ -51,10 +51,10 @@ _ws_item() {
         --set space.$sid \
             background.color=0x00000000              \
             background.corner_radius=6               \
-            background.height=24                     \
+            background.height=18                     \
             background.drawing=off                   \
             label="$label"                           \
-            label.font="HackNerdFont-Bold:Bold:12.0" \
+            label.font="HackNerdFont-Bold:Bold:11.0" \
             label.color=$color                       \
             icon.drawing=off                         \
             padding_left=3                           \
@@ -74,7 +74,7 @@ sketchybar --add bracket workspaces '/space\..*/' \
     --set workspaces \
         background.color=0x33313244     \
         background.corner_radius=8      \
-        background.height=28            \
+        background.height=20            \
         background.border_width=1       \
         background.border_color=0x33cdd6f4
 
@@ -82,7 +82,7 @@ sketchybar --add bracket workspaces '/space\..*/' \
 sketchybar --add item front_app left \
     --set front_app \
         icon.drawing=off                                    \
-        label.font="HackNerdFont-Bold:Bold:13.0"            \
+        label.font="HackNerdFont-Bold:Bold:12.0"            \
         label.color=0xffa6adc8                              \
         padding_left=10                                     \
         script="$PLUGIN_DIR/front_app.sh"                   \
@@ -119,7 +119,7 @@ sketchybar --add item volume right \
 sketchybar --add item cpu right \
     --set cpu \
         icon="󰻠"                   \
-        icon.font="HackNerdFont-Bold:Bold:15.0" \
+        icon.font="HackNerdFont-Bold:Bold:13.0" \
         icon.color=0xffa6e3a1       \
         label.color=0xffcdd6f4      \
         update_freq=10              \
