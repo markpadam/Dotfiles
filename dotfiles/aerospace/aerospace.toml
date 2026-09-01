@@ -11,6 +11,17 @@ config-version = 2
 # `borders active_color=...` line: it runs after login and overrides bordersrc.
 after-startup-command = [
     'exec-and-forget sketchybar',
+    # Launch the workspace apps on login (start-at-login = true). Each app's
+    # windows are then routed to a workspace by the on-window-detected rules
+    # further down. How many windows come back per app is the app's own
+    # restore setting + macOS "reopen windows when logging back in" — for
+    # Safari, turn on Settings > General > "Safari opens with: All windows
+    # from last session".
+    'exec-and-forget open -a Ghostty',
+    'exec-and-forget open -a Safari',
+    'exec-and-forget open -a Mail',
+    'exec-and-forget open -a WhatsApp',
+    'exec-and-forget open -a Vial',
 ]
 
 start-at-login = true
@@ -113,6 +124,38 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 [[on-window-detected]]  # Windows App (Microsoft Remote Desktop)
     if.app-id = 'com.microsoft.rdc.macos'
     run = 'layout floating'
+
+# ── Workspace routing ────────────────────────────────────────────────────────
+# Pins each app to its workspace on login (paired with the `open -a` lines in
+# after-startup-command) and whenever a new window appears. First match wins,
+# so the Safari title rule must come before the catch-all Safari rule.
+# Window *count* per app is the app's own restore + macOS window restoration,
+# not this. Move a window between workspaces by hand with alt-shift-<n>.
+
+[[on-window-detected]]  # Safari — docs/manuals to `man`
+    if.app-id = 'com.apple.Safari'
+    if.window-title-regex-substring = '(?i)guide|docs|documentation|manual|reference|readme|handbook'
+    run = 'move-node-to-workspace man'
+
+[[on-window-detected]]  # Safari — everything else to `browser`
+    if.app-id = 'com.apple.Safari'
+    run = 'move-node-to-workspace browser'
+
+[[on-window-detected]]  # Ghostty
+    if.app-id = 'com.mitchellh.ghostty'
+    run = 'move-node-to-workspace terminal'
+
+[[on-window-detected]]  # Mail
+    if.app-id = 'com.apple.mail'
+    run = 'move-node-to-workspace comms'
+
+[[on-window-detected]]  # WhatsApp
+    if.app-id = 'net.whatsapp.WhatsApp'
+    run = 'move-node-to-workspace comms'
+
+[[on-window-detected]]  # Vial (keyboard config)
+    if.app-id = 'today.vial'
+    run = 'move-node-to-workspace man'
 
 # ── Main keybindings (AeroSpace defaults) ────────────────────────────────────
 [mode.main.binding]

@@ -45,13 +45,33 @@ Five, named, on `alt-1`..`alt-5` (positional):
 
 `persistent-workspaces` (top of the file) keeps all five alive when empty so
 the keys and the SketchyBar pills always land somewhere. `alt-shift-<n>` moves
-the focused window. There is still **no automatic app-to-workspace routing** —
-the "for" column is habit, not config. SketchyBar draws a pill per workspace
-(icon + name); a click runs `aerospace workspace <name>`.
+the focused window. SketchyBar draws a pill per workspace (icon + name); a
+click runs `aerospace workspace <name>`.
 
-### Startup
+### Session persistence
 
-`after-startup-command` launches `sketchybar` and nothing else. **Do not add a
+There is no snapshot/restore — instead the layout is *rebuilt* on each login
+from two halves:
+
+- **`after-startup-command`** `open -a`s the workspace apps (Ghostty, Safari,
+  Mail, WhatsApp, Vial). How many windows each brings back is the app's own
+  restore setting plus the macOS "reopen windows when logging back in" box —
+  for Safari, Settings → General → *"Safari opens with: All windows from last
+  session"*.
+- **`on-window-detected` "Workspace routing"** rules pin each app to a
+  workspace as its windows appear: Ghostty → `terminal`, Safari → `browser`
+  (or `man` if the title looks like docs/a manual — first match wins, so that
+  rule is listed first), Mail / WhatsApp → `comms`, Vial → `man`.
+
+Caveats: one app routes to one workspace (the Safari title split is a
+best-effort regex on the title *at detection time* — a window still loading
+its page lands on `browser`; move it with `alt-shift-5`). Split ratios and
+left/right ordering within a workspace are not restored; AeroSpace re-tiles
+fresh. `desktop` is deliberately unrouted — a clear scratch space.
+
+### Startup command
+
+`after-startup-command` also launches `sketchybar`. **Do not add a
 `borders active_color=…` line here** — it runs after login and overrides
 `~/.config/borders/bordersrc`, which is the single source of truth for the
 border (see `dotfiles/borders/README.md`).

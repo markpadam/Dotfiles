@@ -66,7 +66,9 @@ gotchas; these bullets are just the map.
   `alt`-prefixed bindings. Five named workspaces on `alt-1`..`alt-5` —
   `desktop` / `terminal` / `browser` / `comms` / `man` — shown as SketchyBar
   pills; a list of always-floating apps; `alt--` / `alt-=` resize (no
-  mouse-drag resize, by design). No automatic app-to-workspace routing.
+  mouse-drag resize, by design). On login the workspace apps are relaunched
+  (`after-startup-command`) and `on-window-detected` rules route each back to
+  its workspace — see the AeroSpace README's "Session persistence".
 - **SketchyBar** (`dotfiles/sketchybar/`) — status bar at the macOS menu-bar
   height; workspace pills follow AeroSpace's `exec-on-workspace-change` hook,
   not native macOS Spaces. Splits into two islands around the notch on the
