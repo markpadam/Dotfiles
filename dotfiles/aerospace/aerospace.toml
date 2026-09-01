@@ -106,6 +106,10 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.apple.weather'
     run = 'layout floating'
 
+[[on-window-detected]]  # Windows App (Microsoft Remote Desktop)
+    if.app-id = 'com.microsoft.rdc.macos'
+    run = 'layout floating'
+
 # ── Main keybindings (AeroSpace defaults) ────────────────────────────────────
 [mode.main.binding]
     # Layout

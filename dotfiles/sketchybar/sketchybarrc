@@ -45,11 +45,12 @@ sketchybar --add event aerospace_workspace_change
 
 COLOR=0xff89b4fa
 
-# Five named workspaces (see dotfiles/aerospace/aerospace.toml), icon + word.
-# Glyphs are stored as UTF-8 byte escapes so tooling that rewrites this file
-# can't silently strip the private-use codepoints. Material Design Icons range
-# (F0000+) only — the Font Awesome range (F108 etc.) is absent from Hack Nerd
-# Font *Bold*, which is what the labels render in. Hack Nerd Font glyphs:
+# Five named workspaces (see dotfiles/aerospace/aerospace.toml). The Nerd Font
+# glyph is the item *icon* and the name is the *label*, so icon.padding_right
+# sets the gap between them. Glyphs are stored as UTF-8 byte escapes so tooling
+# that rewrites this file can't silently strip the private-use codepoints.
+# Material Design Icons range (F0000+) only — the Font Awesome range (F108 etc.)
+# is absent from Hack Nerd Font *Bold*. Glyphs:
 #   F0379 monitor  F018D console  F059F web  F0361 message  F02D2 book
 ws_name=(desktop           terminal         browser              comms                man)
 ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb0\x8b\x92')
@@ -62,12 +63,18 @@ for i in "${!ws_name[@]}"; do
             background.corner_radius=6               \
             background.height=18                     \
             background.drawing=off                   \
-            label="${ws_icon[$i]} $n"                \
+            icon="${ws_icon[$i]}"                    \
+            icon.font="HackNerdFont-Bold:Bold:13.0"  \
+            icon.color=$COLOR                        \
+            icon.padding_left=7                      \
+            icon.padding_right=6                     \
+            label="$n"                               \
             label.font="HackNerdFont-Bold:Bold:11.0" \
             label.color=$COLOR                       \
-            icon.drawing=off                         \
-            padding_left=3                           \
-            padding_right=3                          \
+            label.padding_left=0                     \
+            label.padding_right=7                    \
+            padding_left=2                           \
+            padding_right=2                          \
             click_script="aerospace workspace $n"    \
             script="$PLUGIN_DIR/aerospace.sh $n $COLOR"
 done
