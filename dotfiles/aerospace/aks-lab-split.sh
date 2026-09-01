@@ -3,7 +3,7 @@
 #
 # AeroSpace has no persistent split ratio — a workspace re-tiles 50/50 every
 # login — so this runs once from after-startup-command. It waits for both the
-# iTerm (terminal) and Safari (browser) windows to land on `aks-lab`, then
+# Ghostty (terminal) and Safari (browser) windows to land on `aks-lab`, then
 # sets the browser to 40% of the usable width; AeroSpace hands the remaining
 # 60% to the terminal.
 #
@@ -23,7 +23,7 @@ win_id() {   # $1 = app-bundle-id  ->  first matching window id on $ws (may be e
 
 # Wait up to ~30s for both windows to be routed onto the workspace.
 for _ in $(seq 1 30); do
-    term=$(win_id com.googlecode.iterm2)
+    term=$(win_id com.mitchellh.ghostty)
     browser=$(win_id com.apple.Safari)
     [ -n "$term" ] && [ -n "$browser" ] && break
     sleep 1

@@ -120,8 +120,8 @@ cask "mark-text"
 cask "multipass"
 cask "powershell"
 cask "raycast"
-# GPU-accelerated terminal emulator
-cask "wezterm"
+# Fast, native, feature-rich terminal emulator (an Omarchy default)
+cask "ghostty"
 # --- casks present in /opt/homebrew/Caskroom but missed by `brew bundle dump` ---
 # Their install receipts are out of sync with the cask definitions, so dump
 # skips them. They are genuinely installed here, so pin them explicitly.

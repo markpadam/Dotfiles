@@ -1,9 +1,11 @@
 # PowerShell 7 profile — oh-my-posh (paradox) + PSReadLine
-# Drives the iTerm2 "PowerShell 7" dynamic profile. Safe to load from any pwsh session.
+# Drives the "PowerShell 7" Ghostty window (config/ghostty/launch pwsh).
+# Safe to load from any pwsh session.
 
 # --- PATH -------------------------------------------------------------------
-# iTerm2 launches pwsh as a custom command, which does NOT source zprofile, so
-# Homebrew's bin (where oh-my-posh lives) may be missing. Prepend it ourselves.
+# The launcher runs `pwsh -l` directly, not via a login shell, so zprofile is
+# not sourced and Homebrew's bin (where oh-my-posh lives) may be missing.
+# Prepend it ourselves.
 foreach ($p in '/opt/homebrew/bin', '/usr/local/bin') {
     if ((Test-Path $p) -and (":$($env:PATH):" -notlike "*:$($p):*")) {
         $env:PATH = "$p" + [IO.Path]::PathSeparator + $env:PATH

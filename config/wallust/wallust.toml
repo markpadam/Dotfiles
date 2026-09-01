@@ -1,16 +1,15 @@
 # ~/.config/wallust/wallust.toml
 #
-# Generates a palette from a wallpaper and writes it out via the template
-# below. NOT smoke-tested against the installed wallust version yet -- run
-# `wallust run <path-to-wallpaper>` once and check
-# ~/.config/wezterm/colors/wallust.toml gets created; if the template
-# placeholder names below don't match (`wallust --help` / its docs have the
-# current list), fix them there rather than in wezterm.lua, which just reads
-# whatever this produces.
+# Generates a 16-colour palette from a wallpaper and writes it out via the
+# template below. NOT smoke-tested against the installed wallust version yet --
+# run `wallust run <path-to-wallpaper>` once and check
+# ~/.config/ghostty/wallust.conf gets created. If the palette looks wrong the
+# {{...}} token names in templates/ghostty.template are the likely cause --
+# `wallust --help` / its docs have the current list; fix them there.
 
 backend = "full"
 color_space = "lab"
 palette = "dark16"
 
 [templates]
-wezterm = { template = "wezterm.template", target = "~/.config/wezterm/colors/wallust.toml" }
+ghostty = { template = "ghostty.template", target = "~/.config/ghostty/wallust.conf" }

@@ -82,7 +82,7 @@ everything here still applies unchanged.
 Five desktops, named by DesktopRenamer:
 
 ```
-1  Term    iTerm2, dotfiles
+1  Term    Ghostty, dotfiles
 2  Web     Safari
 3  Lab     k8s homelab, Vault
 4  Notes   Apple Notes wiki, docs

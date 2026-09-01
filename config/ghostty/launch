@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Open a named Ghostty window — the replacement for the old iTerm dynamic
+# profiles. Each "profile" is just a locked title + a working directory + a
+# startup command.
+#
+#   launch aks-lab | ide | exam | pwsh | ubuntu
+#
+# macOS Ghostty has no "new window into the running instance" from the CLI, so
+# each launch is `open -na` = a fresh Ghostty instance. That is fine for these
+# on-demand tools; the daily driver stays one instance.
+#
+# `--title` is locked (Ghostty ignores title escape sequences once it is set),
+# which is how dotfiles/aerospace/aerospace.toml routes the "AKS Lab" window to
+# the aks-lab workspace while every other Ghostty window goes to `terminal`.
+set -euo pipefail
+
+repos="$HOME/Documents/gitRepos"
+homelab="$repos/markpadam/Kubernetes-Homelab"
+
+case "${1:-}" in
+  aks-lab)
+    exec open -na Ghostty --args --title="AKS Lab" --working-directory="$homelab" \
+      -e zsh -lc './aks-lab tmux; exec zsh -l' ;;
+  ide)
+    exec open -na Ghostty --args --title="IDE" --working-directory="$repos" \
+      -e zsh -lc '"$HOME/.local/bin/ide" || exec zsh -l' ;;
+  exam)
+    exec open -na Ghostty --args --title="K8s Exam" \
+      -e zsh -lc 'bash ~/.exam-motd.sh 2>/dev/null; exec zsh -l' ;;
+  pwsh)
+    exec open -na Ghostty --args --title="PowerShell 7" -e pwsh -l ;;
+  ubuntu)
+    exec open -na Ghostty --args --title="Ubuntu" \
+      -e zsh -lc 'multipass shell primary; exec zsh -l' ;;
+  *)
+    echo "usage: launch {aks-lab|ide|exam|pwsh|ubuntu}" >&2
+    exit 2 ;;
+esac

@@ -1,5 +1,5 @@
 -- DevOps-tuned additions to stock LazyVim: theme match for the rest of the
--- Omarchy stack, smart-splits for WezTerm/tmux pane nav (tmux prefix is
+-- Omarchy stack, smart-splits for tmux pane nav (tmux prefix is
 -- C-a, unrelated to these <C-hjkl> which move the cursor across split
 -- boundaries), and yaml/terraform/helm language support.
 --

@@ -4,7 +4,7 @@
 # daemon on start; reload with `brew services restart borders`.
 # AeroSpace no longer sets border colours imperatively — see the
 # after-startup-command in aerospace.toml.
-# Palette: Catppuccin Mocha, matching SketchyBar / WezTerm / the shell prompt.
+# Palette: Catppuccin Mocha, matching SketchyBar / Ghostty / the shell prompt.
 options=(
 	style=round
 	width=6.0

@@ -1,0 +1,34 @@
+# Ghostty terminal configuration.
+# Named windows ("AKS-Lab", "IDE", "K8s Exam", "PowerShell 7", "Ubuntu" —
+# what used to be iTerm dynamic profiles) are launched by ./launch, wired into
+# the Hammerspoon menu (Opt+Space -> Terminal). See README.md.
+
+# Theme — wallust.conf (generated from the wallpaper by config/wallust/, and
+# .gitignore'd) overrides this when present; the ? makes the include optional.
+theme = Catppuccin Mocha
+config-file = ?wallust.conf
+
+# Font
+font-family = JetBrains Mono
+font-size = 13
+
+# Window
+window-padding-x = 12
+window-padding-y = 8
+window-theme = dark
+macos-titlebar-style = hidden
+window-padding-balance = true
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+
+# Shell integration
+shell-integration = zsh
+
+# Background opacity
+background-opacity = 0.95
+
+# Misc
+copy-on-select = clipboard
+confirm-close-surface = false

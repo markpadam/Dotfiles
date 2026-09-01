@@ -22,16 +22,15 @@ after-startup-command = [
     'exec-and-forget open -a Mail',
     'exec-and-forget open -a WhatsApp',
     'exec-and-forget open -a Vial',
-    # AKS Lab workspace: an iTerm window on the AKS-Lab dynamic profile (which
-    # cd's into the homelab repo and runs `./aks-lab tmux`) plus a dedicated
-    # Safari window on the cluster dashboard. Both are routed to `aks-lab` by
-    # the on-window-detected rules below. `activate` first — iTerm launched by
-    # a detached osascript otherwise comes up hidden and AeroSpace won't see
-    # its windows until it's unhidden. `make new document` forces a *new*
-    # Safari window rather than a tab in the restored `browser` one. (iTerm may
-    # also open a default-profile window on launch; it routes to aks-lab too.
-    # Silence it with iTerm > Settings > General > Startup: "no windows".)
-    '''exec-and-forget osascript -e 'tell application "iTerm" to activate' -e 'tell application "iTerm" to create window with profile "AKS-Lab"' ''',
+    # AKS Lab workspace: a dedicated Ghostty *instance* whose title is locked to
+    # "AKS Lab" (Ghostty's `--title` ignores escape sequences), running the
+    # homelab tmux cockpit, plus a Safari window on the cluster dashboard.
+    # AeroSpace can't tell two Ghostty windows apart by app id, so the title
+    # rule below routes just this one to `aks-lab`; every other Ghostty window
+    # is the daily driver and lands on `terminal`. `-na` = new instance so the
+    # `--title`/`--working-directory` args actually apply. `make new document`
+    # forces a *new* Safari window rather than a tab in the restored one.
+    '''exec-and-forget open -na Ghostty --args --title="AKS Lab" --working-directory="$HOME/Documents/gitRepos/markpadam/Kubernetes-Homelab" -e zsh -lc './aks-lab tmux; exec zsh -l' ''',
     '''exec-and-forget osascript -e 'tell application "Safari" to make new document with properties {URL:"http://localhost:9997"}' ''',
     # ...then pin aks-lab to a 60/40 terminal:browser width split once both
     # windows have landed (AeroSpace has no persistent split ratio).
@@ -174,15 +173,16 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.apple.Safari'
     run = 'move-node-to-workspace browser'
 
-[[on-window-detected]]  # Ghostty
+[[on-window-detected]]  # Ghostty — the AKS-Lab cockpit only. Its `--title` is
+    # locked to "AKS Lab"; this rule (app-id AND title, both must match) sends
+    # just that one to `aks-lab`. Must stay *above* the catch-all below.
+    if.app-id = 'com.mitchellh.ghostty'
+    if.window-title-regex-substring = '(?i)aks.?lab'
+    run = 'move-node-to-workspace aks-lab'
+
+[[on-window-detected]]  # Ghostty — every other window is the daily driver
     if.app-id = 'com.mitchellh.ghostty'
     run = 'move-node-to-workspace terminal'
-
-[[on-window-detected]]  # iTerm — the lab terminal (Ghostty is the daily driver,
-    # so every iTerm window — AKS-Lab, IDE, k8s-exam, … — lands on `aks-lab`).
-    # To send one profile elsewhere, add a title/app rule *above* this one.
-    if.app-id = 'com.googlecode.iterm2'
-    run = 'move-node-to-workspace aks-lab'
 
 [[on-window-detected]]  # Mail
     if.app-id = 'com.apple.mail'
