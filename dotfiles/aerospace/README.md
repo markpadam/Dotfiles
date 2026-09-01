@@ -113,10 +113,10 @@ display).
 ### Floating apps
 
 `[[on-window-detected]]` rules with `run = 'layout floating'` — Finder, System
-Settings, Calculator, Messages, Music, Weather, Activity Monitor, App Store,
-Archive Utility, Screens Connect, Notes. Alphabetised, one commented block
-each. The rule only fires when a window **opens**, so reopen an app after
-adding it. Get an app id with `aerospace list-apps`.
+Settings, Calculator, Calendar, Reminders, Messages, Music, Weather, Activity
+Monitor, App Store, Archive Utility, Screens Connect, Notes. Alphabetised, one
+commented block each. The rule only fires when a window **opens**, so reopen an
+app after adding it. Get an app id with `aerospace list-apps`.
 
 ## Reload
 

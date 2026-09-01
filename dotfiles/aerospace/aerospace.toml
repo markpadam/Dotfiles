@@ -100,6 +100,10 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.apple.calculator'
     run = 'layout floating'
 
+[[on-window-detected]]  # Calendar
+    if.app-id = 'com.apple.iCal'
+    run = 'layout floating'
+
 [[on-window-detected]]  # CleanMyMac
     if.app-id = 'com.macpaw.CleanMyMac4'
     run = 'layout floating'
@@ -118,6 +122,10 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 
 [[on-window-detected]]  # Notes
     if.app-id = 'com.apple.Notes'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Reminders
+    if.app-id = 'com.apple.reminders'
     run = 'layout floating'
 
 [[on-window-detected]]  # Screens Connect
