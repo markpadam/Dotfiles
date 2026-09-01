@@ -1,9 +1,8 @@
 # JankyBorders
 
 Draws a coloured border around the focused window so it is obvious which one has
-keyboard focus. Originally installed alongside a tiling window manager and kept
-after both of those experiments ended — it is useful with plain macOS window
-management too.
+keyboard focus — the visual half of the AeroSpace tiling setup (AutoRaise moves
+focus with the pointer, this shows you where it landed).
 
 The Apple Notes wiki holds the overview. This file is the config reference.
 
@@ -15,24 +14,36 @@ brew install FelixKratz/formulae/borders
 
 ## Config
 
-`bordersrc` here, symlinked to `~/.config/borders/`. Executable — it is run, not
-sourced, so it needs the exec bit (`git update-index --chmod=+x`; this repo sets
-`core.fileMode = false`).
+`bordersrc` here, symlinked to `~/.config/borders/`. It is the **single source
+of truth** for border appearance — the `borders` daemon (started by
+`brew services`) executes it on launch. AeroSpace does **not** set colours
+imperatively; a `borders active_color=...` line in `aerospace.toml`'s
+`after-startup-command` runs after login and silently overrides this file, so
+there isn't one.
+
+Executable — it is run, not sourced, so it needs the exec bit
+(`git update-index --chmod=+x`; this repo sets `core.fileMode = false`).
 
 Current settings, Catppuccin Mocha:
 
 ```sh
 style=round
-width=4.0
-active_color=0xffcba6f7     # mauve   — focused window
-inactive_color=0xff45475a   # surface1 — unfocused
+width=6.0
+hidpi=on
+active_color="glow(0xffcba6f7)"   # mauve glow — focused window
+inactive_color=0xff313244          # surface0   — unfocused windows
 ```
+
+`glow(...)` gives the focused window a soft outer bloom rather than a flat
+stroke — the "purple glow" the Omarchy look calls for.
 
 ## Width is centred on the window frame
 
 The stroke straddles the frame edge, so it reaches about **half** its width
-outward. At `width=6.0` it stuck out roughly 3pt — enough to collide with what
-was then a 28pt status bar at the top of the screen; `4.0` reaches about 1.5pt.
+outward — at `width=6.0`, roughly 3pt beyond the window. AeroSpace's
+`[gaps] outer.top` (34 on external displays) is tuned around that overhang so
+the border clears the SketchyBar; changing the width here means re-checking
+that gap.
 
 Worth remembering whenever a border looks like it is touching something it
 should not be: it is usually the border reaching outward, not the other element

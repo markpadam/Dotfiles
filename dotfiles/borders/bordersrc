@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
-# JankyBorders config. Reloaded on `brew services restart borders`.
-# Colors: Catppuccin Mocha (matches the shell prompt / terminal theme).
+# JankyBorders — the single source of truth for window borders.
+# Symlinked to ~/.config/borders/ by bootstrap.sh and executed by the borders
+# daemon on start; reload with `brew services restart borders`.
+# AeroSpace no longer sets border colours imperatively — see the
+# after-startup-command in aerospace.toml.
+# Palette: Catppuccin Mocha, matching SketchyBar / WezTerm / the shell prompt.
 options=(
 	style=round
-	width=4.0
-	# On this Retina display hidpi=off draws the border at 1x and then scales
-	# it, which reads soft. On renders at native resolution.
+	width=6.0
+	# hidpi=on renders the border at native resolution; hidpi=off draws it at
+	# 1x and scales up, which reads soft on this Retina display.
 	hidpi=on
-	active_color=0xffcba6f7    # mauve  — focused window
-	inactive_color=0xff45475a  # surface1 — unfocused windows
+	active_color="glow(0xffcba6f7)"   # mauve glow — focused window
+	inactive_color=0xff313244          # surface0   — unfocused windows
 )
 
 borders "${options[@]}"

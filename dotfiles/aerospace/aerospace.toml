@@ -6,9 +6,11 @@ config-version = 2
 # Everything above the [mode.*] tables is local customisation.
 
 # ── Startup ──────────────────────────────────────────────────────────────────
+# Border colours/width live in ~/.config/borders/bordersrc, not here — the
+# borders daemon (brew services) applies them on start. Don't re-add a
+# `borders active_color=...` line: it runs after login and overrides bordersrc.
 after-startup-command = [
     'exec-and-forget sketchybar',
-    'exec-and-forget borders active_color="glow(0xff00ffaa)" inactive_color=0xff313244 width=6.0',
 ]
 
 start-at-login = true
