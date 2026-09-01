@@ -78,6 +78,10 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.apple.calculator'
     run = 'layout floating'
 
+[[on-window-detected]]  # CleanMyMac
+    if.app-id = 'com.macpaw.CleanMyMac4'
+    run = 'layout floating'
+
 [[on-window-detected]]  # Finder
     if.app-id = 'com.apple.finder'
     run = 'layout floating'
