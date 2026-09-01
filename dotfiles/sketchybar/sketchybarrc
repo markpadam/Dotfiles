@@ -45,15 +45,19 @@ sketchybar --add event aerospace_workspace_change
 
 COLOR=0xff89b4fa
 
-# Five named workspaces (see dotfiles/aerospace/aerospace.toml). The Nerd Font
-# glyph is the item *icon* and the name is the *label*, so icon.padding_right
-# sets the gap between them. Glyphs are stored as UTF-8 byte escapes so tooling
-# that rewrites this file can't silently strip the private-use codepoints.
-# Material Design Icons range (F0000+) only — the Font Awesome range (F108 etc.)
-# is absent from Hack Nerd Font *Bold*. Glyphs:
-#   F0379 monitor  F018D console  F059F web  F0361 message  F02D2 book
-ws_name=(desktop           terminal         browser              comms                man)
-ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb0\x8b\x92')
+# Six named workspaces (see dotfiles/aerospace/aerospace.toml). The Nerd Font
+# glyph is the item *icon* and ws_label[i] is the *label*, so icon.padding_right
+# sets the gap between them. The label is the workspace name with its alt-key
+# number in brackets — e.g. `terminal (2)` is on alt-2 — kept decoupled from
+# ws_name (the AeroSpace identifier, used by click_script and aerospace.sh) so
+# the cosmetic suffix never touches AeroSpace. Glyphs are stored as UTF-8 byte
+# escapes so tooling that rewrites this file can't silently strip the
+# private-use codepoints. Material Design Icons range (F0000+) only — the Font
+# Awesome range (F108 etc.) is absent from Hack Nerd Font *Bold*. Glyphs:
+#   F0379 monitor  F018D console  F059F web  F0361 message  F02D2 book  F10FE kubernetes
+ws_name=(desktop            terminal         browser          comms          man          aks-lab)
+ws_label=("desktop (1)"     "terminal (2)"   "browser (3)"    "comms (4)"    "man (5)"    "AKS Lab (6)")
+ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb0\x8b\x92' $'\xf3\xb1\x83\xbe')
 for i in "${!ws_name[@]}"; do
     n="${ws_name[$i]}"
     sketchybar --add item space."$n" left \
@@ -68,7 +72,7 @@ for i in "${!ws_name[@]}"; do
             icon.color=$COLOR                        \
             icon.padding_left=7                      \
             icon.padding_right=6                     \
-            label="$n"                               \
+            label="${ws_label[$i]}"                  \
             label.font="HackNerdFont-Bold:Bold:11.0" \
             label.color=$COLOR                       \
             label.padding_left=0                     \

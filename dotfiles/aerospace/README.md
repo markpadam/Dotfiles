@@ -25,15 +25,15 @@ Privacy & Security → Accessibility) — `bootstrap.sh` cannot click it.
 
 The `[mode.*]` tables are **AeroSpace's bundled `default-config.toml`,
 verbatim** — `alt`-prefixed, no Karabiner remap — *except* the workspace
-block: `alt-1`..`alt-5` (and `alt-shift-1`..`5` to move a window) target the
-five named workspaces below instead of `1`..`9` / `A`..`Z`. The Caps Lock →
+block: `alt-1`..`alt-6` (and `alt-shift-1`..`6` to move a window) target the
+six named workspaces below instead of `1`..`9` / `A`..`Z`. The Caps Lock →
 Ctrl+Option hyper key that drove the first iteration was retired on
 2026-08-30 (`f5e684a`). Keep custom bindings *above* the mode tables so a
 future `default-config.toml` diff stays readable.
 
 ### Workspaces
 
-Five, named, on `alt-1`..`alt-5` (positional):
+Six, named, on `alt-1`..`alt-6` (positional):
 
 | key | workspace | for |
 |-----|-----------|-----|
@@ -42,11 +42,15 @@ Five, named, on `alt-1`..`alt-5` (positional):
 | `alt-3` | `browser`  | Safari, RDP |
 | `alt-4` | `comms`    | Mail, WhatsApp, Messages |
 | `alt-5` | `man`      | manuals, scratch, everything else |
+| `alt-6` | `aks-lab`  | Kubernetes homelab — iTerm (AKS-Lab profile) + Safari on the cluster dashboard |
 
-`persistent-workspaces` (top of the file) keeps all five alive when empty so
+`persistent-workspaces` (top of the file) keeps all six alive when empty so
 the keys and the SketchyBar pills always land somewhere. `alt-shift-<n>` moves
-the focused window. SketchyBar draws a pill per workspace (icon + name); a
-click runs `aerospace workspace <name>`.
+the focused window. SketchyBar draws a pill per workspace (icon + label — the
+label is the workspace name with its `alt`-key number in brackets, e.g.
+`terminal (2)`, and `aks-lab` reads "AKS Lab (6)"); a click runs `aerospace
+workspace <name>`. The bracketed number is cosmetic — `ws_label` in
+`sketchybarrc`, not the AeroSpace workspace identifier.
 
 ### Session persistence
 
@@ -57,17 +61,25 @@ from two halves:
   Mail, WhatsApp, Vial). How many windows each brings back is the app's own
   restore setting plus the macOS "reopen windows when logging back in" box —
   for Safari, Settings → General → *"Safari opens with: All windows from last
-  session"*.
+  session"*. Two extra `osascript` lines open the `aks-lab` pair: an iTerm
+  window on the **AKS-Lab** dynamic profile, and a *new* Safari window
+  (`make new document`, so it is a window and not a tab in the restored
+  `browser` one) on `http://localhost:9997`.
 - **`on-window-detected` "Workspace routing"** rules pin each app to a
   workspace as its windows appear: Ghostty → `terminal`, Safari → `browser`
-  (or `man` if the title looks like docs/a manual — first match wins, so that
-  rule is listed first), Mail / WhatsApp → `comms`, Vial → `man`.
+  (or `man` if the title looks like docs/a manual, or `aks-lab` if the title
+  matches `localhost:9997` — first match wins, so those rules are listed
+  first), Mail / WhatsApp → `comms`, Vial → `man`, **any iTerm window** →
+  `aks-lab` (Ghostty is the daily terminal, so every iTerm profile — AKS-Lab,
+  IDE, k8s-exam — is treated as lab work).
 
-Caveats: one app routes to one workspace (the Safari title split is a
+Caveats: one app routes to one workspace (the Safari title splits are a
 best-effort regex on the title *at detection time* — a window still loading
-its page lands on `browser`; move it with `alt-shift-5`). Split ratios and
-left/right ordering within a workspace are not restored; AeroSpace re-tiles
-fresh. `desktop` is deliberately unrouted — a clear scratch space.
+its page lands on `browser`; move it with `alt-shift-5` / `alt-shift-6`).
+Split ratios and left/right ordering within a workspace are not restored;
+AeroSpace re-tiles fresh. `desktop` is deliberately unrouted — a clear scratch
+space. To send one iTerm profile somewhere other than `aks-lab`, add a
+title/app rule *above* the catch-all iTerm rule.
 
 ### Startup command
 

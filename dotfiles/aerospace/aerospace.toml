@@ -22,6 +22,17 @@ after-startup-command = [
     'exec-and-forget open -a Mail',
     'exec-and-forget open -a WhatsApp',
     'exec-and-forget open -a Vial',
+    # AKS Lab workspace: an iTerm window on the AKS-Lab dynamic profile (which
+    # cd's into the homelab repo and runs `./aks-lab tmux`) plus a dedicated
+    # Safari window on the cluster dashboard. Both are routed to `aks-lab` by
+    # the on-window-detected rules below. `activate` first — iTerm launched by
+    # a detached osascript otherwise comes up hidden and AeroSpace won't see
+    # its windows until it's unhidden. `make new document` forces a *new*
+    # Safari window rather than a tab in the restored `browser` one. (iTerm may
+    # also open a default-profile window on launch; it routes to aks-lab too.
+    # Silence it with iTerm > Settings > General > Startup: "no windows".)
+    '''exec-and-forget osascript -e 'tell application "iTerm" to activate' -e 'tell application "iTerm" to create window with profile "AKS-Lab"' ''',
+    '''exec-and-forget osascript -e 'tell application "Safari" to make new document with properties {URL:"http://localhost:9997"}' ''',
 ]
 
 start-at-login = true
@@ -32,9 +43,9 @@ accordion-padding = 30
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
-# Five named workspaces, kept alive even when empty so the keys and the
-# SketchyBar pills always land somewhere. Bound to alt-1..alt-5 below.
-persistent-workspaces = ['desktop', 'terminal', 'browser', 'comms', 'man']
+# Six named workspaces, kept alive even when empty so the keys and the
+# SketchyBar pills always land somewhere. Bound to alt-1..alt-6 below.
+persistent-workspaces = ['desktop', 'terminal', 'browser', 'comms', 'man', 'aks-lab']
 
 # ── Tree normalizations ───────────────────────────────────────────────────────
 enable-normalization-flatten-containers = true
@@ -132,6 +143,17 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 # Window *count* per app is the app's own restore + macOS window restoration,
 # not this. Move a window between workspaces by hand with alt-shift-<n>.
 
+[[on-window-detected]]  # Safari — the AKS Lab dashboard to `aks-lab`
+    # Must precede the two rules below (first match wins). Best-effort: it
+    # matches the window title *at creation*, which for a freshly-opened
+    # `make new document` window is the loading URL ("localhost:9997") before
+    # the page renders its own <title>. If the dashboard's title turns out to
+    # be something stable, tighten this to that; if a window slips through to
+    # `browser`, alt-shift-6 moves it.
+    if.app-id = 'com.apple.Safari'
+    if.window-title-regex-substring = '(?i)localhost:9997'
+    run = 'move-node-to-workspace aks-lab'
+
 [[on-window-detected]]  # Safari — docs/manuals to `man`
     if.app-id = 'com.apple.Safari'
     if.window-title-regex-substring = '(?i)guide|docs|documentation|manual|reference|readme|handbook'
@@ -144,6 +166,12 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 [[on-window-detected]]  # Ghostty
     if.app-id = 'com.mitchellh.ghostty'
     run = 'move-node-to-workspace terminal'
+
+[[on-window-detected]]  # iTerm — the lab terminal (Ghostty is the daily driver,
+    # so every iTerm window — AKS-Lab, IDE, k8s-exam, … — lands on `aks-lab`).
+    # To send one profile elsewhere, add a title/app rule *above* this one.
+    if.app-id = 'com.googlecode.iterm2'
+    run = 'move-node-to-workspace aks-lab'
 
 [[on-window-detected]]  # Mail
     if.app-id = 'com.apple.mail'
@@ -179,13 +207,14 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     alt-minus = 'resize smart -50'
     alt-equal = 'resize smart +50'
 
-    # Workspaces — five named, positional. See persistent-workspaces above and
-    # the SketchyBar pills (dotfiles/sketchybar/sketchybarrc). 6-9 / A-Z dropped.
+    # Workspaces — six named, positional. See persistent-workspaces above and
+    # the SketchyBar pills (dotfiles/sketchybar/sketchybarrc). 7-9 / A-Z dropped.
     alt-1 = 'workspace desktop'
     alt-2 = 'workspace terminal'
     alt-3 = 'workspace browser'
     alt-4 = 'workspace comms'
     alt-5 = 'workspace man'
+    alt-6 = 'workspace aks-lab'
 
     # Move focused window to workspace (same positional keys + shift)
     alt-shift-1 = 'move-node-to-workspace desktop'
@@ -193,6 +222,7 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     alt-shift-3 = 'move-node-to-workspace browser'
     alt-shift-4 = 'move-node-to-workspace comms'
     alt-shift-5 = 'move-node-to-workspace man'
+    alt-shift-6 = 'move-node-to-workspace aks-lab'
 
     # Workspace navigation
     alt-tab = 'workspace-back-and-forth'

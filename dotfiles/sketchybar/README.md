@@ -35,19 +35,22 @@ run it.
 menu-bar height), rounded and blurred.
 
 ```
-LEFT    workspace pills (desktop terminal browser comms man)  ->  front_app
+LEFT    workspace pills (desktop terminal browser comms man aks-lab)  ->  front_app
 RIGHT   clock  battery  volume  cpu  memory
 ```
 
-One pill per AeroSpace workspace, `icon + name` (Nerd Font glyph from the
+One pill per AeroSpace workspace, `icon + label` (Nerd Font glyph from the
 Material Design range — the Font Awesome range is missing from Hack Nerd Font
 Bold, which the labels render in; glyphs are stored as `$'\xNN'` byte escapes
-so a file rewrite can't strip the private-use codepoints). Pills subscribe to
-the `aerospace_workspace_change` event and colour the focused one; each pill's
+so a file rewrite can't strip the private-use codepoints). The label
+(`ws_label`) is the workspace name plus its `alt`-key number in brackets —
+`desktop (1)` … `AKS Lab (6)` — kept separate from `ws_name`, the AeroSpace
+identifier used by `click_script` and `aerospace.sh`. Pills subscribe to the
+`aerospace_workspace_change` event and colour the focused one; each pill's
 `click_script` is `aerospace workspace <name>`, so a click switches workspace
-through the AeroSpace CLI directly — **no osascript, no Automation grant.**
-`plugins/aerospace.sh` takes `<name> <accent-color>` and reads
-`$FOCUSED_WORKSPACE` from the trigger.
+through the AeroSpace CLI
+directly — **no osascript, no Automation grant.** `plugins/aerospace.sh` takes
+`<name> <accent-color>` and reads `$FOCUSED_WORKSPACE` from the trigger.
 
 ### Notch islands
 
