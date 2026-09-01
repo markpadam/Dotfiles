@@ -104,7 +104,9 @@ cask "copilot-cli"
 cask "gitmichaelqiu/tap/desktoprenamer", trusted: true
 # i3-like tiling window manager for macOS
 cask "nikitabobko/tap/aerospace", trusted: true
-# Remaps Caps Lock to a hyper key (hold) / Escape (tap) for AeroSpace bindings
+# Keyboard remapper. The Caps Lock hyper key it used to provide for AeroSpace
+# was retired 2026-08-30; karabiner.json now only sets the keyboard type. Kept
+# for now, but a candidate for removal.
 cask "karabiner-elements"
 # Screen colour temperature controller
 cask "flux-app"

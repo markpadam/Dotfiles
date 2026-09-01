@@ -1,9 +1,9 @@
 -- ~/.config/wezterm/wezterm.lua
 --
--- Deliberately minimal: AeroSpace tiles windows and tmux (prefix C-a, see
+-- Deliberately minimal: AeroSpace tiles windows and tmux (prefix C-b, see
 -- dotfiles/.tmux.conf) multiplexes panes/sessions inside them. WezTerm does
--- NOT get its own leader/split keybindings here -- a WezTerm leader on C-a
--- would swallow tmux's prefix before tmux ever saw it. If wallust has been
+-- NOT get its own leader/split keybindings here -- a WezTerm leader on the
+-- same chord would swallow tmux's prefix before tmux ever saw it. If wallust has been
 -- run, it drops a generated palette at colors/wallust.toml; fall back to the
 -- static Catppuccin Mocha scheme (matching borders/sketchybar) until then.
 
@@ -37,9 +37,8 @@ config.window_padding = { left = 8, right = 8, top = 8, bottom = 8 }
 config.hide_tab_bar_if_only_one_tab = true
 config.use_fancy_tab_bar = false
 
--- Non-conflicting keys only: nothing on C-a, C-b or any ctrl-alt-* combo
--- (the latter is AeroSpace's global modifier via the Karabiner hyper key
--- and would never reach WezTerm anyway).
+-- Non-conflicting keys only: nothing on C-b (tmux's prefix) or any alt-*
+-- combo (AeroSpace's global modifier, which never reaches WezTerm anyway).
 config.keys = {
   { key = "=", mods = "CMD", action = wezterm.action.IncreaseFontSize },
   { key = "-", mods = "CMD", action = wezterm.action.DecreaseFontSize },

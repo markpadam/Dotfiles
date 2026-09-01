@@ -59,65 +59,63 @@ an earlier stock-macOS period (4-5 August 2026, when SketchyBar, yabai and
 Raycast were all torn out — see git history around `554451c` if that state
 is ever wanted back). The current stack:
 
-- **AeroSpace** (`dotfiles/aerospace/aerospace.toml`) — tiling window manager,
-  5 workspaces (`term`/`web`/`lab`/`notes`/`comms`) with app-routing rules and
-  a resize mode (no mouse-drag resize, by design).
-- **Karabiner-Elements** (`snapshots/karabiner/`) — remaps Caps Lock to a
-  Ctrl+Option hyper key (hold) / Escape (tap), driving every AeroSpace
-  binding. Copied, not symlinked — see `snapshots/` below.
-- **SketchyBar** (`dotfiles/sketchybar/`) — status bar; its workspace pills
-  track AeroSpace's `exec-on-workspace-change` hook directly, not native
-  macOS Spaces (which this setup collapses to one per display — see
-  `aerospace.toml`'s header comment and `dotfiles/sketchybar/README.md`).
+Each tool below has a `README.md` next to its config with the settings and
+gotchas; these bullets are just the map.
+
+- **AeroSpace** (`dotfiles/aerospace/`) — tiling window manager on its stock
+  `alt`-prefixed bindings. Workspaces `1`-`9` (shown in SketchyBar) and
+  `A`-`Z`, a list of always-floating apps, `alt--` / `alt-=` resize (no
+  mouse-drag resize, by design). No workspace naming or app-routing yet.
+- **SketchyBar** (`dotfiles/sketchybar/`) — status bar at the macOS menu-bar
+  height; workspace pills follow AeroSpace's `exec-on-workspace-change` hook,
+  not native macOS Spaces. Splits into two islands around the notch on the
+  built-in.
+- **JankyBorders** (`dotfiles/borders/`) — mauve "glow" border on the focused
+  window.
+- **AutoRaise** (`config/AutoRaise/`) — focus-follows-mouse, with raise. Hold
+  Control to suspend it.
+- **Hammerspoon** (`dotfiles/hammerspoon/init.lua`) — auto-hides the menu bar
+  when a wired external display is connected. Nothing else. Linked to
+  `~/.hammerspoon/init.lua` by an explicit line in `bootstrap.sh` (Hammerspoon
+  does not read `~/.config`).
 - **Raycast** (`raycast/scripts/`) — launcher; Script Commands only, restored
   from git history (`a12c1ef`).
-- **JankyBorders** — unchanged throughout every prior teardown/rebuild.
+- **Karabiner-Elements** (`snapshots/karabiner/`) — now only declares the
+  keyboard as ANSI. The Caps Lock → Ctrl+Option hyper key it used to provide
+  was retired on 30 August 2026 (`f5e684a`) when AeroSpace moved to its native
+  `alt` bindings. A candidate for removal.
 
-Hotkey binding (Raycast) and Accessibility/Input Monitoring grants
-(AeroSpace, Karabiner) are manual GUI steps that `bootstrap.sh` cannot do —
-macOS requires a human click for both. SketchyBar's Mission-Control-key
-pill (`items/workspaces.sh`) also needs an **Automation** grant, separately —
-System Settings → Privacy & Security → Automation → SketchyBar → System
-Events — or its click fails silently with "osascript is not allowed to
-send keystrokes" in `sketchybar.err.log`.
+Raycast's hotkey and the Accessibility grants (AeroSpace, AutoRaise,
+Hammerspoon) are manual GUI steps that `bootstrap.sh` cannot do — macOS
+requires a human click for each.
 
 ## Terminal, toolchains, theming
 
 Added 29-30 August 2026 (phase F), rounding out the rest of the Omarchy-style
 setup that phases A-E didn't cover:
 
-- **WezTerm** (`config/wezterm/wezterm.lua`) — deliberately carries no
-  leader/split keybindings of its own: AeroSpace tiles windows and tmux
-  (prefix `C-a`, see `dotfiles/.tmux.conf`) multiplexes panes/sessions
-  inside them, so a WezTerm leader on `C-a` would swallow tmux's prefix
-  before tmux ever saw it. Reads a wallust-generated palette from
-  `colors/wallust.toml` if present, else falls back to a static Catppuccin
-  Mocha scheme. `wezterm.color.load_scheme`'s exact signature hasn't been
-  verified against the installed version — check there first if it errors
-  on startup.
-- **mise** (`config/mise/config.toml`) — Node/Python/Go/Rust. Needs
-  `eval "$(mise activate zsh)"` to actually shim tool versions into the
-  shell; that line lives in `dotfiles/.zshrc` right after the profile.d
-  loop, guarded on `command -v mise`.
-- **wallust** (`config/wallust/`) — generates a colour palette from a
-  wallpaper. **Not in Homebrew core** — the formula is
-  `chenrui333/tap/wallust` (`trusted: true`, per Homebrew 6's tap-trust
-  model). The WezTerm template (`config/wallust/templates/wezterm.template`)
-  is untested against the installed wallust version; run
-  `wallust run <wallpaper>` once and confirm
-  `~/.config/wezterm/colors/wallust.toml` actually gets created before
-  trusting it. Doesn't yet reach SketchyBar's or WezTerm's *other* static
-  Catppuccin colors — a natural next step, not done here.
-- The prompt is **Starship** (`config/starship.toml`), wired up in the
-  Omachy-managed block at the end of `dotfiles/.zshrc`. It replaced
-  powerlevel10k on 30 August 2026; oh-my-zsh stays for its plugins but
-  loads no theme (`ZSH_THEME=""`), and the old `.p10k.zsh` and the
-  instant-prompt preamble are gone.
+Each has a `README.md` next to its config.
+
+- **WezTerm** (`config/wezterm/`) — the terminal emulator. Deliberately no
+  leader/split keys: AeroSpace tiles windows, tmux multiplexes inside them.
+  wallust palette if present, else the built-in Catppuccin Mocha scheme.
+- **tmux** (`dotfiles/.tmux.conf`) — prefix `C-b`, TPM plugins, a Dracula
+  status bar, `v`/`x` splits, `h/j/k/l` pane moves. `config/omachy/dev-session.sh`
+  builds a preset session on top of it.
+- **Shell** (`dotfiles/.zshrc`) — zsh + oh-my-zsh (plugins only, no theme).
+  The "Omachy managed" block at the end wires **Starship** (prompt,
+  `config/starship.toml`, replaced powerlevel10k on 30 August 2026), `fzf`,
+  `atuin`, vi mode, `fastfetch`, and the `dev` function (`config/omachy/`).
+- **mise** (`config/mise/`) — Node/Python/Go/Rust versions. Needs
+  `eval "$(mise activate zsh)"`, which `.zshrc` does after the profile.d loop.
+- **wallust** (`config/wallust/`) — generates a palette from the wallpaper.
+  **Not in Homebrew core** (`chenrui333/tap/wallust`, `trusted: true`).
+  Untested against the installed version — see its README before relying on it.
 
 ### `config/` → `~/.config`
 
 `nvim/` (LazyVim) · `fish/` · `powershell/` · `git/` · `AutoRaise/` ·
-`starship.toml`
+`wezterm/` · `wallust/` · `mise/` · `omachy/` · `starship.toml`
 
 `AutoRaise` needs an Accessibility grant made by hand the first time (System
 Settings → Privacy & Security → Accessibility) before `brew services start`
@@ -132,9 +130,10 @@ These apps rewrite their own config files at runtime. Symlinking them into a
 public git repo would let the app commit its runtime state — and in `gh`'s case
 potentially an auth token — straight into version control. `bootstrap.sh` copies
 them only when no live config already exists, so it never clobbers a
-working setup. `karabiner/karabiner.json` is the Caps Lock hyper-key remap
-that drives AeroSpace's bindings — Karabiner rewrites this file constantly
-(device IDs, UI state), so it belongs here for the same reason `gh` does.
+working setup. `karabiner/karabiner.json` now only declares the keyboard type
+(the Caps Lock hyper key was retired on 30 August 2026) — but Karabiner still
+rewrites this file constantly (device IDs, UI state), so it belongs here for
+the same reason `gh` does.
 
 ## The shell
 
@@ -146,6 +145,10 @@ own (`ZSH_THEME=""`).
 Plugins: `git kubectl kubectx helm docker docker-compose terraform azure fluxcd
 zsh-autosuggestions zsh-syntax-highlighting`. The last two are loaded by
 oh-my-zsh only — the Omachy block does not re-source them.
+
+The Omachy-managed block also initialises `fzf` (`Ctrl-t` file / `Alt-c` cd),
+`atuin` (history search on `Ctrl-r`), `mise`, vi mode (`set -o vi`),
+`fastfetch` on launch, and the `dev` function (`config/omachy/dev-session.sh`).
 
 `.zshrc` guards the oh-my-zsh load, so the same file still produces a working
 shell on hosts without it.
