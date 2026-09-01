@@ -58,6 +58,8 @@ brew "nnn"
 brew "node"
 # Prompt theme engine for any shell
 brew "oh-my-posh"
+# AI coding agent, built for the terminal
+brew "opencode"
 # Generic machine emulator and virtualizer
 brew "qemu"
 # Cross-platform application and UI framework

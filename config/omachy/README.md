@@ -32,7 +32,6 @@ scratch    empty
 The session name is `basename` with `.` and `:` replaced by `-` (tmux rejects
 both in session names).
 
-Needs `tmux`, `nvim` and `lazygit` (all in the `Brewfile`) plus `opencode`
-(installed via Homebrew but **not yet recorded in the `Brewfile`** — add it).
+Needs `tmux`, `nvim`, `lazygit` and `opencode` — all in the `Brewfile`.
 Keep the exec bit (`git update-index --chmod=+x`; the repo sets
 `core.fileMode = false`).
