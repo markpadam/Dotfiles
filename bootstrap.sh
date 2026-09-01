@@ -101,6 +101,13 @@ for name in borders aerospace sketchybar; do
     [ -e "$DOTFILES/dotfiles/$name" ] && link "$DOTFILES/dotfiles/$name" "$HOME/.config/$name"
 done
 
+# Hammerspoon reads ~/.hammerspoon, not ~/.config — link just the init.lua so
+# its Spoons/ directory and runtime state stay out of the repo.
+if [ -f "$DOTFILES/dotfiles/hammerspoon/init.lua" ]; then
+    mkdir -p "$HOME/.hammerspoon"
+    link "$DOTFILES/dotfiles/hammerspoon/init.lua" "$HOME/.hammerspoon/init.lua"
+fi
+
 for src in "$DOTFILES/config"/*; do
     [ -e "$src" ] || continue
     link "$src" "$HOME/.config/$(basename "$src")"
