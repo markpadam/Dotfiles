@@ -53,12 +53,51 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     outer.right      = 8
 
 # ── Window rules ──────────────────────────────────────────────────────────────
-[[on-window-detected]]
+# Apps that open floating rather than joining the tiles. Only fires on newly
+# detected windows — reopen an already-open window for a new rule to take hold.
+# Get an app-id with `aerospace list-apps`.
+[[on-window-detected]]  # Activity Monitor
+    if.app-id = 'com.apple.ActivityMonitor'
+    run = 'layout floating'
+
+[[on-window-detected]]  # App Store
+    if.app-id = 'com.apple.AppStore'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Archive Utility
+    if.app-id = 'com.apple.archiveutility'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Calculator
+    if.app-id = 'com.apple.calculator'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Finder
+    if.app-id = 'com.apple.finder'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Messages
+    if.app-id = 'com.apple.MobileSMS'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Music
+    if.app-id = 'com.apple.Music'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Notes
+    if.app-id = 'com.apple.Notes'
+    run = 'layout floating'
+
+[[on-window-detected]]  # Screens Connect
+    if.app-id = 'com.edovia.Screens-Connect'
+    run = 'layout floating'
+
+[[on-window-detected]]  # System Settings
     if.app-id = 'com.apple.systempreferences'
     run = 'layout floating'
 
-[[on-window-detected]]
-    if.app-id = 'com.apple.calculator'
+[[on-window-detected]]  # Weather
+    if.app-id = 'com.apple.weather'
     run = 'layout floating'
 
 # ── Main keybindings (AeroSpace defaults) ────────────────────────────────────
