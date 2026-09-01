@@ -33,6 +33,9 @@ after-startup-command = [
     # Silence it with iTerm > Settings > General > Startup: "no windows".)
     '''exec-and-forget osascript -e 'tell application "iTerm" to activate' -e 'tell application "iTerm" to create window with profile "AKS-Lab"' ''',
     '''exec-and-forget osascript -e 'tell application "Safari" to make new document with properties {URL:"http://localhost:9997"}' ''',
+    # ...then pin aks-lab to a 60/40 terminal:browser width split once both
+    # windows have landed (AeroSpace has no persistent split ratio).
+    'exec-and-forget "$HOME/.config/aerospace/aks-lab-split.sh"',
 ]
 
 start-at-login = true

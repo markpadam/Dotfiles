@@ -20,6 +20,9 @@ Privacy & Security → Accessibility) — `bootstrap.sh` cannot click it.
 `aerospace.toml` here, symlinked to `~/.config/aerospace/` by the hardcoded
 `borders aerospace sketchybar` loop in `bootstrap.sh` (not the generic
 `config/` loop — that is where this Mac's existing symlink already points).
+`aks-lab-split.sh` sits alongside it (same symlinked dir) and is invoked from
+`after-startup-command` — keep its exec bit (`git update-index --chmod=+x`;
+the repo sets `core.fileMode = false`).
 
 ### Bindings
 
@@ -42,7 +45,7 @@ Six, named, on `alt-1`..`alt-6` (positional):
 | `alt-3` | `browser`  | Safari, RDP |
 | `alt-4` | `comms`    | Mail, WhatsApp, Messages |
 | `alt-5` | `man`      | manuals, scratch, everything else |
-| `alt-6` | `aks-lab`  | Kubernetes homelab — iTerm (AKS-Lab profile) + Safari on the cluster dashboard |
+| `alt-6` | `aks-lab`  | Kubernetes homelab — iTerm (AKS-Lab profile) + Safari on the cluster dashboard, 60/40 width split |
 
 `persistent-workspaces` (top of the file) keeps all six alive when empty so
 the keys and the SketchyBar pills always land somewhere. `alt-shift-<n>` moves
@@ -64,7 +67,13 @@ from two halves:
   session"*. Two extra `osascript` lines open the `aks-lab` pair: an iTerm
   window on the **AKS-Lab** dynamic profile, and a *new* Safari window
   (`make new document`, so it is a window and not a tab in the restored
-  `browser` one) on `http://localhost:9997`.
+  `browser` one) on `http://localhost:9997`. A third line runs
+  **`aks-lab-split.sh`**, which waits for both windows and then sets a 60/40
+  terminal:browser width split — AeroSpace has no persistent split ratio, so
+  a workspace otherwise re-tiles 50/50 every login. The script derives the
+  width from the main display each run (adapts to docked/undocked) and uses an
+  absolute `resize width`, so it is safe to re-run; `alt--` / `alt-=` nudge it
+  afterwards.
 - **`on-window-detected` "Workspace routing"** rules pin each app to a
   workspace as its windows appear: Ghostty → `terminal`, Safari → `browser`
   (or `man` if the title looks like docs/a manual, or `aks-lab` if the title
