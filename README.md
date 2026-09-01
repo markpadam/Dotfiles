@@ -63,9 +63,10 @@ Each tool below has a `README.md` next to its config with the settings and
 gotchas; these bullets are just the map.
 
 - **AeroSpace** (`dotfiles/aerospace/`) — tiling window manager on its stock
-  `alt`-prefixed bindings. Workspaces `1`-`9` (shown in SketchyBar) and
-  `A`-`Z`, a list of always-floating apps, `alt--` / `alt-=` resize (no
-  mouse-drag resize, by design). No workspace naming or app-routing yet.
+  `alt`-prefixed bindings. Five named workspaces on `alt-1`..`alt-5` —
+  `desktop` / `terminal` / `browser` / `comms` / `man` — shown as SketchyBar
+  pills; a list of always-floating apps; `alt--` / `alt-=` resize (no
+  mouse-drag resize, by design). No automatic app-to-workspace routing.
 - **SketchyBar** (`dotfiles/sketchybar/`) — status bar at the macOS menu-bar
   height; workspace pills follow AeroSpace's `exec-on-workspace-change` hook,
   not native macOS Spaces. Splits into two islands around the notch on the

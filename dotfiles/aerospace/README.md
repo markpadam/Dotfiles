@@ -23,19 +23,31 @@ Privacy & Security → Accessibility) — `bootstrap.sh` cannot click it.
 
 ### Bindings
 
-Everything under the `[mode.*]` tables is **AeroSpace's bundled
-`default-config.toml`, verbatim** — `alt`-prefixed, no Karabiner remap. The
-Caps Lock → Ctrl+Option hyper key that drove the first iteration was retired
-on 2026-08-30 (`f5e684a`). Keep custom bindings *above* the mode tables so a
+The `[mode.*]` tables are **AeroSpace's bundled `default-config.toml`,
+verbatim** — `alt`-prefixed, no Karabiner remap — *except* the workspace
+block: `alt-1`..`alt-5` (and `alt-shift-1`..`5` to move a window) target the
+five named workspaces below instead of `1`..`9` / `A`..`Z`. The Caps Lock →
+Ctrl+Option hyper key that drove the first iteration was retired on
+2026-08-30 (`f5e684a`). Keep custom bindings *above* the mode tables so a
 future `default-config.toml` diff stays readable.
 
 ### Workspaces
 
-Numbered `1`-`9` and lettered `A`-`Z`, straight from the defaults. **No naming
-and no app-to-workspace routing are configured** — the `term`/`web`/`lab`/
-`notes`/`comms` idea is habit, not config. SketchyBar draws pills for `1`-`9`
-only. `dotfiles/sketchybar/sketchybarrc-named` is a prepared alternative that
-labels lettered workspaces; nothing routes windows to them yet.
+Five, named, on `alt-1`..`alt-5` (positional):
+
+| key | workspace | for |
+|-----|-----------|-----|
+| `alt-1` | `desktop`  | nothing pinned — a clear space |
+| `alt-2` | `terminal` | Ghostty / WezTerm |
+| `alt-3` | `browser`  | Safari, RDP |
+| `alt-4` | `comms`    | Mail, WhatsApp, Messages |
+| `alt-5` | `man`      | manuals, scratch, everything else |
+
+`persistent-workspaces` (top of the file) keeps all five alive when empty so
+the keys and the SketchyBar pills always land somewhere. `alt-shift-<n>` moves
+the focused window. There is still **no automatic app-to-workspace routing** —
+the "for" column is habit, not config. SketchyBar draws a pill per workspace
+(icon + name); a click runs `aerospace workspace <name>`.
 
 ### Startup
 

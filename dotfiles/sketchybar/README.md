@@ -22,7 +22,6 @@ via the `Brewfile` cask list.
 
 ```
 sketchybarrc          the bar — sourced by the daemon on start / --reload
-sketchybarrc-named    unused variant: lettered, named workspace pills
 plugins/*.sh          one script per item, invoked on its own schedule/events
 ```
 
@@ -36,15 +35,19 @@ run it.
 menu-bar height), rounded and blurred.
 
 ```
-LEFT    workspace pills 1-9  ->  front_app (frontmost app name)
+LEFT    workspace pills (desktop terminal browser comms man)  ->  front_app
 RIGHT   clock  battery  volume  cpu  memory
 ```
 
-Workspace pills subscribe to the `aerospace_workspace_change` event and colour
-the focused one; each pill's `click_script` is `aerospace workspace <n>`, so a
-click switches workspace through the AeroSpace CLI directly — **no osascript,
-no Automation grant.** `plugins/aerospace.sh` takes `<id> <accent-color>` and
-reads `$FOCUSED_WORKSPACE` from the trigger.
+One pill per AeroSpace workspace, `icon + name` (Nerd Font glyph from the
+Material Design range — the Font Awesome range is missing from Hack Nerd Font
+Bold, which the labels render in; glyphs are stored as `$'\xNN'` byte escapes
+so a file rewrite can't strip the private-use codepoints). Pills subscribe to
+the `aerospace_workspace_change` event and colour the focused one; each pill's
+`click_script` is `aerospace workspace <name>`, so a click switches workspace
+through the AeroSpace CLI directly — **no osascript, no Automation grant.**
+`plugins/aerospace.sh` takes `<name> <accent-color>` and reads
+`$FOCUSED_WORKSPACE` from the trigger.
 
 ### Notch islands
 
@@ -53,18 +56,10 @@ On the notched built-in the bar splits into two pills (`left_island` /
 continuous bar. `plugins/notch_islands.sh` decides which, keyed on
 `NSScreen.screens[0].safeAreaInsets.top` (`>0` ⇒ built-in), and an invisible
 `notch_islands` worker item re-runs it on `display_change` and `system_woke`.
-`sketchybarrc-named` carries the same logic.
 
 `notch_width` in `--bar` is **not** the mechanism — it only reserves centre
 space for `center`-anchored items (there are none here) and does not split the
 bar background.
-
-### Named variant
-
-`sketchybarrc-named` labels lettered workspaces (`D`ev / `W`eb / `M`essaging /
-`E`mail / `S`cratch). To try it, point the `sketchybarrc` symlink or the
-daemon's config path at it. Nothing routes windows to those workspaces yet —
-see `dotfiles/aerospace/README.md`.
 
 ## Reload
 
