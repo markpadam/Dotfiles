@@ -132,5 +132,34 @@ sketchybar --add item memory right \
         update_freq=10              \
         script="$PLUGIN_DIR/memory.sh"
 
+# ── Notch: two islands on the built-in, one bar on external displays ──────────
+# Left- and right-hand background pills. Drawn only when the bar is on the
+# notched built-in (toggled by notch_islands.sh); on an external display they
+# stay hidden and the bar's own background is the single continuous bar.
+sketchybar --add bracket left_island '/space\..*/' front_app \
+    --set left_island \
+        background.color=0xcc1e1e2e     \
+        background.corner_radius=8      \
+        background.height=24            \
+        background.border_width=1       \
+        background.border_color=0x44cdd6f4 \
+        background.drawing=off
+
+sketchybar --add bracket right_island clock battery volume cpu memory \
+    --set right_island \
+        background.color=0xcc1e1e2e     \
+        background.corner_radius=8      \
+        background.height=24            \
+        background.border_width=1       \
+        background.border_color=0x44cdd6f4 \
+        background.drawing=off
+
+# Invisible worker: re-evaluates which layout to show on every display change.
+sketchybar --add item notch_islands left \
+    --set notch_islands drawing=off updates=on \
+        script="$PLUGIN_DIR/notch_islands.sh" \
+    --subscribe notch_islands display_change system_woke
+
 # ── Trigger initial update ────────────────────────────────────────────────────
 sketchybar --update
+"$PLUGIN_DIR/notch_islands.sh"   # set the initial one-bar / two-island state
