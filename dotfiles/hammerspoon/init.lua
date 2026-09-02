@@ -57,6 +57,8 @@ local clipboard = require("clipboard")
 local idle      = require("idle")
 local services  = require("services")
 local whichkey  = require("whichkey")
+local switcher  = require("switcher")
+local dock      = require("dock")
 
 -- Command menu on the Raycast slot (Opt+Space). Tree in menu.lua.
 menu.bind({ "alt" }, "space")
@@ -82,6 +84,8 @@ whichkey.register("⌥ Space", "Command menu")
 osd.start()
 clipboard.start()
 whichkey.start()
+switcher.start()
+dock.start()
 services.start()
 idle.start()
 

@@ -40,7 +40,9 @@ toggles.lua     bar / borders / DND / Night Shift / keep-awake / Zen mode
 clipboard.lua   clipboard history (Ctrl+Alt+V)
 idle.lua        dim-then-lock idle progression (hypridle)
 services.lua    brew-update count, now-playing, screen recording, window flash
-whichkey.lua    hold ⌥ → live cheatsheet of AeroSpace + Hammerspoon keys
+whichkey.lua    hold ⌥ → cheatsheet (macOS / Hammerspoon / AeroSpace / nvim / tmux)
+switcher.lua    themed Cmd+Tab (hs.window.switcher; needs the Karabiner remap)
+dock.lua        themed left-edge dock — the macOS one can't be re-coloured
 pickers.lua     audio / Bluetooth / Wi-Fi device pickers for the menu
 webapp.lua      run a website as its own app window (web2app)
 emoji.lua       emoji + Nerd-Font-glyph picker
@@ -55,13 +57,32 @@ Reload: `hs -c 'hs.reload()'`. **`hs -c` hangs on canvas/eventtap code** — use
 | --- | --- |
 | `⌥ Space` | Command menu |
 | `⌃⌥ Space` | Next theme |
+| `⌘ Tab` | Themed window switcher (via the Karabiner remap — see below) |
 | `⌃\`` / `⌃⌥ T` | Toggle the scratchpad terminal |
 | `⌃⌥ V` | Clipboard history |
 | `⌃⌥ K` | Toggle keep-awake |
 | `⌃⌥ Z` | Toggle Zen mode |
 | `⌃⌥ N` | Toggle Night Shift |
 | `⌃⌥ R` | Start / stop screen recording |
-| hold `⌥` | which-key cheatsheet |
+| hold `⌥` | which-key cheatsheet (Esc to close) |
+
+## The dock (`dock.lua`)
+
+A themed `hs.canvas` strip on the left edge (matching the `orientation left` the
+native Dock had): pinned apps + everything else running, a mauve dot under the
+running ones, click to launch or focus. Auto-hides; mouse to the far-left edge
+to bring it back. Re-skins on a theme change. On start it parks the native Dock
+(`autohide-delay 1000`); `require("dock").stop()` restores it. Edit `M.pinned`
+at the top of the file; `M.edge = "bottom"` before `start()` for a bottom dock.
+
+## Themed Cmd+Tab (`switcher.lua`)
+
+macOS reserves `Cmd+Tab` at the Carbon level — neither `hs.hotkey` nor an
+eventtap can take it — so a **Karabiner** rule remaps it to `Cmd+F18` /
+`Cmd+F19` (Cmd still held) and `switcher.lua` binds those to
+`hs.window.switcher`. Setup and the driver-approval steps are in
+`snapshots/karabiner/README.md`. Without Karabiner running, `Cmd+Tab` stays the
+native switcher.
 
 `⌃⌥` (Ctrl+Alt) is used everywhere so nothing clashes with AeroSpace's `alt-`
 bindings.
