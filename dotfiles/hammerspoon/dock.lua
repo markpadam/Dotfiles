@@ -13,7 +13,7 @@ local theme = require("theme")
 
 local M = {}
 M.edge           = "left"      -- "left" | "bottom"
-M.iconSize       = 40
+M.iconSize       = 48
 M.hideNativeDock  = true
 M.pinned = {
   "com.apple.finder",
