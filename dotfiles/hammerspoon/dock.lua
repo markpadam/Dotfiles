@@ -3,8 +3,8 @@
 -- An hs.canvas strip on the left edge (matching the `orientation left` the
 -- native Dock was set to): pinned apps + anything else running, each with a
 -- running dot, click to launch or focus. Auto-hides; slide the mouse to the
--- left edge to bring it back. Colours come from theme.lua and re-skin on a
--- theme change. The native Dock is parked (autohide-delay) while this runs.
+-- left edge — or hold Ctrl — to bring it back. Colours come from theme.lua and
+-- re-skin on a theme change. The native Dock is parked while this runs.
 --
 --   require("dock").start()
 --   require("dock").edge = "bottom"   -- before start(), if you prefer
@@ -30,7 +30,8 @@ M.pinned = {
 
 local GAP, PAD, DOT, RADIUS, MARGIN = 8, 8, 5, 12, 6
 local canvas, poll, appWatcher, screenWatcher, hideTimer
-local shown, list, iconCache, dockParked
+local flagsTap, ctrlKeyTap, ctrlArmTimer
+local shown, list, iconCache, dockParked, ctrlHold
 
 -- ── app list ──────────────────────────────────────────────────────────────
 local function icon(bid)
@@ -156,8 +157,39 @@ local function tick()
   end
   local overPanel = shown and m.x >= f.x - 4 and m.x <= f.x + f.w + 4
     and m.y >= f.y - 4 and m.y <= f.y + f.h + 4
-  if (nearEdge or overPanel) then M.reveal()
+  if (nearEdge or overPanel or ctrlHold) then M.reveal()
   elseif shown then scheduleHide() end
+end
+
+-- ── hold Ctrl to show ─────────────────────────────────────────────────────
+-- A key pressed within the arm window is "Ctrl + <key>", so cancel.
+local function onCtrlKey()
+  if ctrlArmTimer then ctrlArmTimer:stop(); ctrlArmTimer = nil end
+  if ctrlKeyTap then ctrlKeyTap:stop() end
+  return false
+end
+
+local function onFlags(e)
+  local f = e:getFlags()
+  local onlyCtrl = f.ctrl and not (f.cmd or f.alt or f.shift)
+  if onlyCtrl then
+    if not ctrlHold and not ctrlArmTimer then
+      ctrlKeyTap:start()
+      ctrlArmTimer = hs.timer.doAfter(0.3, function()
+        ctrlArmTimer = nil
+        if ctrlKeyTap then ctrlKeyTap:stop() end
+        if hs.eventtap.checkKeyboardModifiers().ctrl then
+          ctrlHold = true
+          M.reveal()
+        end
+      end)
+    end
+  else
+    if ctrlArmTimer then ctrlArmTimer:stop(); ctrlArmTimer = nil end
+    if ctrlKeyTap then ctrlKeyTap:stop() end
+    if ctrlHold then ctrlHold = false; scheduleHide() end
+  end
+  return false
 end
 
 -- ── native Dock ───────────────────────────────────────────────────────────
@@ -198,17 +230,22 @@ function M.start()
   screenWatcher = hs.screen.watcher.new(function() if shown then draw() end end)
   screenWatcher:start()
 
+  flagsTap = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, onFlags)
+  ctrlKeyTap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, onCtrlKey)
+  flagsTap:start()
+
   poll = hs.timer.new(0.2, tick, true):start()
 end
 
 function M.stop()
-  for _, t in ipairs({ poll }) do if t then t:stop() end end
+  for _, t in ipairs({ poll, flagsTap, ctrlKeyTap }) do if t then t:stop() end end
   if appWatcher then appWatcher:stop(); appWatcher = nil end
   if screenWatcher then screenWatcher:stop(); screenWatcher = nil end
   if hideTimer then hideTimer:stop(); hideTimer = nil end
-  poll = nil
+  if ctrlArmTimer then ctrlArmTimer:stop(); ctrlArmTimer = nil end
+  poll, flagsTap, ctrlKeyTap = nil, nil, nil
   if canvas then canvas:delete(); canvas = nil end
-  shown = false
+  shown, ctrlHold = false, false
   parkNativeDock(false)
 end
 
