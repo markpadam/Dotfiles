@@ -45,16 +45,16 @@ switcher.lua    themed Cmd+Tab (menu-style list; needs the Karabiner remap)
 dock.lua        themed left-edge dock — the macOS one can't be re-coloured
 wsflash.lua     centre flash of the workspace name on switch (Hyprland-style)
 pickers.lua     audio / Bluetooth / Wi-Fi / SSH pickers for the menu
-webapp.lua      web apps as Safari 'Add to Dock' apps; syncs the home dashboard
+webapp.lua      lists Safari 'Add to Dock' apps; syncs the home dashboard
 emoji.lua       emoji + Nerd-Font-glyph picker
 ```
 
 `wsflash.lua` reads `~/.cache/omachy/workspace`, which `aerospace.toml`'s
-`exec-on-workspace-change` writes. `webapp.lua` launches a web app as its matching **Safari "Add to Dock" app**
-(`~/Applications/*.app`, `com.apple.Safari.WebApp.*` — frameless + iCloud
-Keychain autofill; make them via Safari ▸ File ▸ Add to Dock, named to match) —
-or, if there's no dedicated app yet, just opens the URL in Safari (a `·` on the
-menu row). It also pulls the home
+`exec-on-workspace-change` writes. `webapp.lua` is a launcher only — you make/remove web apps in Safari ▸ File ▸
+Add to Dock. The menu lists every `com.apple.Safari.WebApp.*` in `~/Applications`
+plus a **Home Dashboard** submenu (auto-synced from the dashboard's
+`/api/services`; a service opens as its Safari app if you've made one, else a
+Safari tab). It also pulls the home
 dashboard's `/api/services` on start + every 6h and keeps a web-app entry per
 service (`source = "homepage"`, pruned when one goes); hand-added entries are
 left alone. The `SketchyBar`

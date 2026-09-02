@@ -120,39 +120,6 @@ function M.launch(app)
   else openInSafari(app.url) end
 end
 
-function M.add()
-  local ok1, name = hs.dialog.textPrompt("New web app", "Name", "", "Next", "Cancel")
-  if ok1 ~= "Next" or name == "" then return end
-  local ok2, url = hs.dialog.textPrompt("New web app", "URL for " .. name, "https://", "Add", "Cancel")
-  if ok2 ~= "Add" or not url:match("^https?://") then
-    if ok2 == "Add" then hs.alert.show("web app: URL must start with http(s)://") end
-    return
-  end
-  local slug = slugify(name)
-  local list = load()
-  list[#list + 1] = { name = name, url = url, slug = slug }
-  save(list); fetchIcon(slug, url)
-  hs.alert.show("\u{f0ac}  Added " .. name)
-end
-
--- open a URL in Safari so the user can finish with File ▸ Add to Dock
-function M.newSafariApp()
-  local ok, url = hs.dialog.textPrompt("New Safari web app",
-    "Opens the URL in Safari — then use its\nFile ▸ Add to Dock (name it to match).",
-    "https://", "Open in Safari", "Cancel")
-  if ok ~= "Open in Safari" or not url:match("^https?://") then return end
-  openInSafari(url)
-  hs.timer.doAfter(1.2, function()
-    hs.alert.show("Safari ▸ File ▸ Add to Dock  to finish", 5)
-  end)
-end
-
-function M.remove(slug)
-  local out = {}
-  for _, a in ipairs(load()) do if a.slug ~= slug then out[#out + 1] = a end end
-  save(out); iconCache[slug] = nil
-end
-
 -- ── sync from the home dashboard ──────────────────────────────────────────
 function M.syncHomepage(cb)
   hs.task.new("/usr/bin/curl", function(_, body)
@@ -201,19 +168,17 @@ local function row(a)
   }
 end
 
+-- Just a launcher — web apps are made / removed by hand in Safari ▸ File ▸
+-- Add to Dock. The home dashboard's services are auto-synced (open as a Safari
+-- app if you've made one, else a Safari tab).
 function M.menu()
-  local list = load()
-  local mine, homepage, dash = {}, {}, nil
-  for _, a in ipairs(list) do
+  local homepage, dash = {}, nil
+  for _, a in ipairs(load()) do
     if a.slug == "home-dashboard" then dash = a
-    elseif a.source == "homepage" then homepage[#homepage + 1] = a
-    else mine[#mine + 1] = a end
+    elseif a.source == "homepage" then homepage[#homepage + 1] = a end
   end
 
-  local items = {
-    { name = "New Safari web app…", g = "\u{f0fe}", action = M.newSafariApp },
-    { name = "Add web app…",        g = "\u{f0fe}", action = M.add },
-  }
+  local items = {}
 
   if dash or #homepage > 0 then
     local sub = {}
@@ -226,32 +191,17 @@ function M.menu()
     for _, a in ipairs(homepage) do sub[#sub + 1] = row(a) end
     items[#items + 1] = { name = "Home Dashboard", image = dash and iconFor(dash.slug) or nil,
       g = "\u{f0ac}", menu = { title = "Home Dashboard", items = sub } }
+    items[#items + 1] = { header = "SAFARI WEB APPS" }
   end
 
-  if #mine > 0 then items[#items + 1] = { header = "" } end
-  for _, a in ipairs(mine) do items[#items + 1] = row(a) end
-
-  -- every Safari web app on disk, so ones made outside the menu are reachable
-  local sa = M.safariApps()
-  if #sa > 0 then
-    local ss = {}
-    for _, s in ipairs(sa) do
-      ss[#ss + 1] = { name = cleanName(s.name),
-        action = function() hs.task.new("/usr/bin/open", nil, { s.path }):start() end }
-    end
-    items[#items + 1] = { header = "" }
-    items[#items + 1] = { name = "Safari Dock apps", g = "\u{f179}",
-      menu = { title = "Safari Dock apps", items = ss } }
+  for _, s in ipairs(M.safariApps()) do
+    items[#items + 1] = {
+      name = cleanName(s.name), image = hs.image.imageFromPath(s.path),
+      action = function() hs.task.new("/usr/bin/open", nil, { s.path }):start() end,
+    }
   end
-
-  if #list > 0 then
-    local rm = {}
-    for _, a in ipairs(list) do
-      rm[#rm + 1] = { name = a.name .. (a.source == "homepage" and "  (auto)" or ""),
-        action = function() M.remove(a.slug); hs.alert.show("Removed " .. a.name) end }
-    end
-    items[#items + 1] = { header = "" }
-    items[#items + 1] = { name = "Remove web app", g = "\u{f014}", menu = { title = "Remove", items = rm } }
+  if #items == 0 then
+    items[1] = { name = "No Safari web apps — Safari ▸ File ▸ Add to Dock", action = function() end }
   end
   return { title = "Web Apps", items = items }
 end
@@ -260,16 +210,11 @@ end
 function M.start()
   local list, have = load(), {}
   for _, a in ipairs(list) do have[a.slug] = true end
-  for _, seed in ipairs({
-    { name = "Messenger",      url = "https://www.messenger.com/", slug = "messenger" },
-    { name = "Home Dashboard", url = HOMEPAGE,                     slug = "home-dashboard" },
-  }) do
-    if not have[seed.slug] then
-      list[#list + 1] = seed
-      fetchIcon(seed.slug, seed.url)
-    end
+  if not have["home-dashboard"] then
+    list[#list + 1] = { name = "Home Dashboard", url = HOMEPAGE, slug = "home-dashboard" }
+    fetchIcon("home-dashboard", HOMEPAGE)
+    save(list)
   end
-  save(list)
   M.syncHomepage()
   M._timer = hs.timer.new(6 * 60 * 60, function() M.syncHomepage() end, true):start()
 end
