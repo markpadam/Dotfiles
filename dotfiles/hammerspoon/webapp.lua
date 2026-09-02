@@ -1,12 +1,10 @@
 -- webapp.lua — websites as quick-launch entries in Opt+Space -> Web Apps.
 --
--- Launch order for an entry:
---   1. a Safari "Add to Dock" web app that matches (frameless, and it uses
---      iCloud Keychain autofill) — you create these once via Safari ▸ File ▸
---      Add to Dock; they live in ~/Applications as com.apple.Safari.WebApp.* bundles
---   2. Brave `--app=<url>` in Brave's DEFAULT profile (frameless, Brave's own
---      password manager / logins)
---   3. the default browser
+-- An entry launches its matching **Safari "Add to Dock" web app** if one exists
+-- (~/Applications/*.app, com.apple.Safari.WebApp.* — frameless, and it uses
+-- iCloud Keychain autofill). If not, it just opens in Safari — from there,
+-- File ▸ Add to Dock makes it a real app. A "·" in the menu row means "no
+-- dedicated app yet, opens as a tab".
 --
 -- Registry: ~/.local/share/omachy/webapps.json   (not tracked)
 -- Favicons: ~/.local/share/omachy/webapp-icons/<slug>.png
@@ -111,15 +109,15 @@ local function iconFor(slug)
 end
 
 -- ── launch / add / remove ─────────────────────────────────────────────────
+local function openInSafari(url)
+  hs.osascript.applescript(
+    ('tell application "Safari"\nactivate\nmake new document with properties {URL:%q}\nend tell'):format(url))
+end
+
 function M.launch(app)
   local s = safariAppFor(app)
-  if s then hs.task.new("/usr/bin/open", nil, { s.path }):start(); return end
-  if hs.application.pathForBundleID("com.brave.Browser") then
-    hs.task.new("/usr/bin/open", nil,
-      { "-na", "Brave Browser", "--args", "--app=" .. app.url }):start()
-  else
-    hs.execute("open " .. ("%q"):format(app.url))
-  end
+  if s then hs.task.new("/usr/bin/open", nil, { s.path }):start()
+  else openInSafari(app.url) end
 end
 
 function M.add()
@@ -143,8 +141,7 @@ function M.newSafariApp()
     "Opens the URL in Safari — then use its\nFile ▸ Add to Dock (name it to match).",
     "https://", "Open in Safari", "Cancel")
   if ok ~= "Open in Safari" or not url:match("^https?://") then return end
-  hs.osascript.applescript(
-    ('tell application "Safari"\nactivate\nmake new document with properties {URL:%q}\nend tell'):format(url))
+  openInSafari(url)
   hs.timer.doAfter(1.2, function()
     hs.alert.show("Safari ▸ File ▸ Add to Dock  to finish", 5)
   end)
@@ -198,7 +195,7 @@ local function row(a)
   local img = iconFor(a.slug)
   if not img then fetchIcon(a.slug, a.url) end
   return {
-    name = a.name .. (safariAppFor(a) and "" or "  ·"),   -- trailing dot = Brave fallback
+    name = a.name .. (safariAppFor(a) and "" or "  ·"),   -- trailing dot = no dedicated Safari app, opens as a tab
     image = img, g = img and nil or "\u{f0ac}",
     action = function() M.launch(a) end,
   }

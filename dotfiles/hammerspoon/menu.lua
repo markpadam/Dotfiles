@@ -110,7 +110,6 @@ local CUSTOM_APPS = { title = "Custom Apps", g = NF.custom, items = {
   { name = "Claude",         app = "com.anthropic.claudefordesktop",  action = focusID("com.anthropic.claudefordesktop") },
   { name = "VS Code",        app = "com.microsoft.VSCode",            action = focusID("com.microsoft.VSCode") },
   { name = "Ghostty",        app = "com.mitchellh.ghostty",           action = focusID("com.mitchellh.ghostty") },
-  { name = "Brave Browser",  app = "com.brave.Browser",               action = focusID("com.brave.Browser") },
   { name = "GitHub Desktop", app = "com.github.GitHubClient",         action = focusID("com.github.GitHubClient") },
   { name = "Postman",        app = "com.postmanlabs.mac",             action = focusID("com.postmanlabs.mac") },
   { name = "Freelens",       app = "app.freelens.Freelens",           action = focusID("app.freelens.Freelens") },
@@ -1082,7 +1081,7 @@ function M.run(...)
   end
 end
 
--- Open with a search query pre-filled:  require("menu").openWith("brave")
+-- Open with a search query pre-filled:  require("menu").openWith("k9s")
 function M.openWith(q)
   M.open()
   hs.timer.doAfter(0.28, function()

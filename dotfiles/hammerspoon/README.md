@@ -45,16 +45,16 @@ switcher.lua    themed Cmd+Tab (menu-style list; needs the Karabiner remap)
 dock.lua        themed left-edge dock — the macOS one can't be re-coloured
 wsflash.lua     centre flash of the workspace name on switch (Hyprland-style)
 pickers.lua     audio / Bluetooth / Wi-Fi / SSH pickers for the menu
-webapp.lua      web apps (Safari Dock app > Brave --app); syncs the home dashboard
+webapp.lua      web apps as Safari 'Add to Dock' apps; syncs the home dashboard
 emoji.lua       emoji + Nerd-Font-glyph picker
 ```
 
 `wsflash.lua` reads `~/.cache/omachy/workspace`, which `aerospace.toml`'s
-`exec-on-workspace-change` writes. `webapp.lua` launches a web app as, in order: a matching **Safari "Add to
-Dock" app** (`~/Applications/*.app`, `com.apple.Safari.WebApp.*` — frameless +
-iCloud Keychain autofill; you make these via Safari ▸ File ▸ Add to Dock, name
-to match), else **Brave `--app=<url>`** in the default profile (a `·` in the
-menu row flags this), else the default browser. It also pulls the home
+`exec-on-workspace-change` writes. `webapp.lua` launches a web app as its matching **Safari "Add to Dock" app**
+(`~/Applications/*.app`, `com.apple.Safari.WebApp.*` — frameless + iCloud
+Keychain autofill; make them via Safari ▸ File ▸ Add to Dock, named to match) —
+or, if there's no dedicated app yet, just opens the URL in Safari (a `·` on the
+menu row). It also pulls the home
 dashboard's `/api/services` on start + every 6h and keeps a web-app entry per
 service (`source = "homepage"`, pruned when one goes); hand-added entries are
 left alone. The `SketchyBar`
@@ -165,7 +165,7 @@ The theme switcher stays in `theme.lua` (it powers every panel's colours) but
 is no longer in the menu — the theme is settled.
 
 Deep entry points still work: `require("menu").openAt("Clipboard")`,
-`.openWith("brave")`, `.run("Capture", "Selection → clipboard")`.
+`.openWith("k9s")`, `.run("Capture", "Selection → clipboard")`.
 
 ## Do Not Disturb
 
