@@ -196,7 +196,7 @@ function M.menu()
 
   for _, s in ipairs(M.safariApps()) do
     items[#items + 1] = {
-      name = cleanName(s.name), image = hs.image.imageFromPath(s.path),
+      name = cleanName(s.name), image = hs.image.iconForFile(s.path),
       action = function() hs.task.new("/usr/bin/open", nil, { s.path }):start() end,
     }
   end
