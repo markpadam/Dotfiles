@@ -45,7 +45,7 @@ switcher.lua    themed Cmd+Tab (menu-style list; needs the Karabiner remap)
 dock.lua        themed left-edge dock — the macOS one can't be re-coloured
 wsflash.lua     centre flash of the workspace name on switch (Hyprland-style)
 pickers.lua     audio / Bluetooth / Wi-Fi / SSH pickers for the menu
-webapp.lua      websites as Safari quick-launch; auto-syncs the home dashboard
+webapp.lua      websites frameless via Brave --app; auto-syncs the home dashboard
 emoji.lua       emoji + Nerd-Font-glyph picker
 ```
 
@@ -85,12 +85,12 @@ at the top of the file; `M.edge = "bottom"` before `start()` for a bottom dock.
 
 ## Themed Cmd+Tab (`switcher.lua`)
 
-macOS reserves `Cmd+Tab` at the Carbon level — neither `hs.hotkey` nor an
-eventtap can take it — so a **Karabiner** rule remaps it to `Cmd+F18` /
-`Cmd+F19` (Cmd still held) and `switcher.lua` binds those to
-`hs.window.switcher`. Setup and the driver-approval steps are in
-`snapshots/karabiner/README.md`. Without Karabiner running, `Cmd+Tab` stays the
-native switcher.
+A menu-style `hs.canvas` list (one row per app, MRU order, real icons) —
+styled exactly like the Opt+Space menu. macOS reserves `Cmd+Tab` at the Carbon
+level — neither `hs.hotkey` nor an eventtap can take it — so a **Karabiner**
+rule remaps it to `Cmd+F18` / `Cmd+F19` (Cmd still held) and `switcher.lua`
+binds those. Setup and driver-approval steps: `snapshots/karabiner/README.md`.
+Without Karabiner running, `Cmd+Tab` stays the native switcher.
 
 `⌃⌥` (Ctrl+Alt) is used everywhere so nothing clashes with AeroSpace's `alt-`
 bindings.
@@ -135,7 +135,7 @@ kept for the odd manual `wallust run <image>`; nothing calls it automatically.
 `sketchybarrc` adds hidden `hsq.*` items that Hammerspoon turns on:
 `hsq.media` (now playing), `hsq.updates` (`brew outdated` count),
 `hsq.rec` (recording), `hsq.caffeine` / `hsq.dnd` / `hsq.zen` /
-`hsq.nightshift` / `hsq.borders` (toggle state). The glyph is set from Lua so
+`hsq.nightshift` / `hsq.borders` (toggle state), `hsq.vpn` (VPN up). The glyph is set from Lua so
 Nerd Font codepoints stay out of the shell file.
 
 ## The command menu (`menu.lua`)
