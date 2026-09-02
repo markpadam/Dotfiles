@@ -52,11 +52,10 @@ hotkey() { # hotkey <id> <enabled true|false> <ascii> <keycode> <modifiers>
       </dict></dict>"
 }
 
-# Ctrl+1..0 switch to Desktop 1..10 (ids 118-127). Off by default beyond the
-# first few. With no hotkey daemon in the setup these ARE the desktop-switching
-# keys -- Ctrl+1..5 is how you move between Term/Web/Lab/Notes/Comms, so turning
-# them off leaves only Ctrl+arrows and Mission Control.
-# Note the keycodes are not sequential -- 5 and 6 are swapped, as are 7 and 8.
+# Ctrl+1..0 switch to Desktop 1..10 (ids 118-127) — legacy stock-macOS Spaces
+# nav, left enabled but inert (AeroSpace collapses Mission Control to one Space
+# per display). Note the keycodes are not sequential -- 5 and 6 are swapped, as
+# are 7 and 8.
 hotkey 118 true 49 18 262144   # Desktop 1
 hotkey 119 true 50 19 262144   # Desktop 2
 hotkey 120 true 51 20 262144   # Desktop 3
@@ -67,6 +66,14 @@ hotkey 124 true 55 26 262144   # Desktop 7
 hotkey 125 true 56 28 262144   # Desktop 8
 hotkey 126 true 57 25 262144   # Desktop 9
 hotkey 127 true 48 29 262144   # Desktop 10
+
+# Mission Control "Move left/right a space" (79/81) and "Move window a space"
+# (80/82) — DISABLED so AeroSpace's own ctrl-left / ctrl-right workspace-cycle
+# bindings win. macOS grabs these chords before AeroSpace's hotkey handler
+# otherwise. (These entries are bare {enabled=…} in the plist, no parameters.)
+for id in 79 80 81 82; do
+    defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add "$id" '{ enabled = 0; }'
+done
 
 # Ctrl+Opt+Space, "Select next source in Input menu". Disabled originally
 # because it collided with skhd's float toggle on the same chord. skhd went on
