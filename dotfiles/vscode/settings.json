@@ -1,0 +1,91 @@
+{
+    "security.workspace.trust.untrustedFiles": "open",
+    "editor.fontFamily": "CaskaydiaCove Nerd Font",
+    "redhat.telemetry.enabled": false,
+    "workbench.iconTheme": "vscode-icons",
+    "vs-kubernetes": {
+        "vscode-kubernetes.minikube-path.windows": "C:\\Users\\markp\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe",
+        "vscode-kubernetes.kubectl-path.windows": "C:\\Users\\markp\\.vs-kubernetes\\tools\\kubectl\\kubectl.exe",
+        "vscode-kubernetes.helm-path.windows": "C:\\Users\\markp\\.vs-kubernetes\\tools\\helm\\windows-amd64\\helm.exe",
+        "vscode-kubernetes.helm-path-mac": "/Users/markpadam/.vs-kubernetes/tools/helm/darwin-arm64/helm",
+        "vscode-kubernetes.minikube-path-mac": "/Users/markpadam/.vs-kubernetes/tools/minikube/darwin-arm64/minikube",
+        "vscode-kubernetes.kubectl-path-mac": "/Users/markpadam/.vs-kubernetes/tools/kubectl/kubectl"
+    },
+    "[azure-pipelines]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.autoIndent": "full"
+    },
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "editor.minimap.enabled": false,
+    "git.openRepositoryInParentFolders": "never",
+    "workbench.colorTheme": "Catppuccin Mocha",
+    "vsicons.dontShowNewVersionMessage": true,
+    "git.autofetch": true,
+    "git.enableSmartCommit": true,
+    "git.confirmSync": false,
+    "@azure.argTenant": "",
+    "bicep.enableSurveys": false,
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "github.copilot.chat.codeGeneration.instructions": [],
+    "docker.extension.enableComposeLanguageServer": false,
+    "[dockercompose]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "[github-actions-workflow]": {
+        "editor.defaultFormatter": "redhat.vscode-yaml"
+    },
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "workbench.startupEditor": "none",
+    "window.titleBarStyle": "custom",
+    "window.customTitleBarVisibility": "never",
+    "window.commandCenter": false,
+    "terminal.integrated.mouseWheelScrollSensitivity": 3,
+    "simpleBrowser.focusLockIndicator.enabled": true,
+    "chat.hookFilesLocations": {
+        ".github/hooks": true,
+        ".claude/settings.local.json": true,
+        ".claude/settings.json": true,
+        "~/.copilot/hooks": true,
+        "~/.claude/settings.json": true,
+        "~/.agents/hooks": true
+    },
+    "chat.viewSessions.orientation": "stacked",
+    "azureTerraform.survey": {
+        "surveyPromptDate": "never",
+        "surveyPromptIgnoredCount": 0
+    },
+    "yaml.schemas": {
+        "file:///Users/markpadam/.vscode/extensions/continue.continue-1.2.22-darwin-arm64/config-yaml-schema.json": [
+            ".continue/**/*.yaml"
+        ]
+    },
+    "docker.extension.dockerEngineAvailabilityPrompt": false,
+    "claudeCode.useTerminal": true,
+    "yaml.disableSchemaDetection": [
+        "**/.github/workflows/*.yml",
+        "**/.github/workflows/*.yaml",
+        "**/.gitea/workflows/*.yml",
+        "**/.gitea/workflows/*.yaml",
+        "**/.forgejo/workflows/*.yml",
+        "**/.forgejo/workflows/*.yaml",
+        "azure-pipelines.yml",
+        "azure-pipelines.yaml"
+    ]
+}

@@ -1,4 +1,4 @@
--- whichkey.lua — hold Option (alt) for ~0.4s with nothing else pressed and a
+-- whichkey.lua — hold Option (alt) for ~0.7s with nothing else pressed and a
 -- cheatsheet fades in: three columns of the keys worth remembering — macOS +
 -- Hammerspoon, AeroSpace (parsed live from aerospace.toml), Neovim + Terminal.
 -- Once up it stays; let go of Option, then a single tap of Option (or Esc)
@@ -15,6 +15,8 @@ local ui = require("ui")
 local M = {}
 local HOME = os.getenv("HOME")
 local et   = hs.eventtap.event.types
+
+local HOLD = 0.7               -- seconds to hold Option before the sheet opens
 
 local registered = {}          -- { {chord, desc}, ... } from init.lua
 local canvas, flagsTap, armKeyTap, escTap, armTimer, armed, shown, releasedSinceShow
@@ -45,7 +47,7 @@ local MACOS = {
   { "⌘ M", "Minimise window" },
   { "⌘⇧ .", "Toggle hidden files" },
   { "⌘ ⌫", "Move to Trash" },
-  { "Fn Fn", "Dictation" },
+  { "Right ⌘ ×2", "Dictation" },
 }
 
 local NEOVIM = {
@@ -218,7 +220,7 @@ end
 function M.register(chord, desc) registered[#registered + 1] = { chord, desc } end
 
 -- ── hold to open, tap Option (or Esc) to close ────────────────────────────
--- Hold Option alone for 0.4s -> show. A key pressed during that window is
+-- Hold Option alone for 0.7s -> show. A key pressed during that window is
 -- "alt + <key>", so cancel. Once it's up: let go of Option, then a single
 -- press of Option closes it again (Esc too).
 local function onArmKey()
@@ -246,7 +248,7 @@ local function onFlags(e)
     if not armed then
       armed = true
       armKeyTap:start()
-      armTimer = hs.timer.doAfter(0.4, function()
+      armTimer = hs.timer.doAfter(HOLD, function()
         armTimer = nil
         if armed then M.show() end
       end)

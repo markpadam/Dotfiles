@@ -458,7 +458,7 @@ local MACOS = { title = "macOS", g = NF.apple, width = 460, items = {
   shortcut("⌃⌘ Q",           "Lock screen"),
   shortcut("⌘⌥ Esc",         "Force quit"),
   shortcut("⌘ ,",            "App settings"),
-  shortcut("Fn Fn",          "Dictation"),
+  shortcut("Right ⌘ ×2",     "Dictation"),
   section("SCREENSHOTS"),
   shortcut("⌘⇧ 3",           "Whole screen"),
   shortcut("⌘⇧ 4",           "Selected region"),

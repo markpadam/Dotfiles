@@ -110,6 +110,19 @@ if [ -d "$DOTFILES/dotfiles/hammerspoon" ]; then
     done
 fi
 
+# VS Code keeps its user config under ~/Library/Application Support, not
+# ~/.config. Link just settings.json + keybindings.json — VS Code rewrites both
+# on every GUI toggle, so expect them to show up dirty; that's intentional
+# (commit the changes you meant). Extensions are a separate list restored by
+# install/vscode.sh.
+if [ "$MACOS" = "1" ] && [ -d "$DOTFILES/dotfiles/vscode" ]; then
+    CODE_USER="$HOME/Library/Application Support/Code/User"
+    mkdir -p "$CODE_USER"
+    for f in "$DOTFILES/dotfiles/vscode"/*.json; do
+        [ -e "$f" ] && link "$f" "$CODE_USER/$(basename "$f")"
+    done
+fi
+
 for src in "$DOTFILES/config"/*; do
     [ -e "$src" ] || continue
     link "$src" "$HOME/.config/$(basename "$src")"

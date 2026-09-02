@@ -51,6 +51,11 @@ bash ~/.dotfiles/macos/defaults.sh
 `borders/`, `aerospace/` and `sketchybar/` also live here (rather than under
 `config/`) and are linked to `~/.config/` — that is where this Mac's existing
 symlinks already point, and moving them would break a working machine.
+`hammerspoon/` links into `~/.hammerspoon/`, and `vscode/`
+(`settings.json` + `keybindings.json`) into `~/Library/Application Support/Code/
+User/` — both via explicit `bootstrap.sh` blocks. VS Code rewrites its two
+files on every GUI toggle, so expect them dirty; extensions stay in
+`packages/vscode-extensions.txt`.
 
 ## Window management
 
