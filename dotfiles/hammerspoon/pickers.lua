@@ -6,9 +6,10 @@
 -- ✓ are always current. CLIs are queried synchronously — all are sub-100ms.
 
 local M = {}
-local SAS = "/opt/homebrew/bin/SwitchAudioSource"
-local BU  = "/opt/homebrew/bin/blueutil"
-local NS  = "/usr/sbin/networksetup"
+local HOME = os.getenv("HOME")
+local SAS  = "/opt/homebrew/bin/SwitchAudioSource"
+local BU   = "/opt/homebrew/bin/blueutil"
+local NS   = "/usr/sbin/networksetup"
 
 local function lines(cmd)
   local out = hs.execute(cmd) or ""
@@ -58,6 +59,37 @@ function M.bluetoothMenu()
     items[#items + 1] = { name = "Bluetooth settings", g = "\u{f013}",
       action = openURL("x-apple.systempreferences:com.apple.BluetoothSettings") }
     return { title = "Bluetooth", items = items }
+  end
+end
+
+-- ── ssh ────────────────────────────────────────────────────────────────────
+-- `Host` entries from ~/.ssh/config (first alias per line, wildcards skipped);
+-- each opens a Ghostty window running `ssh <host>`.
+function M.sshMenu()
+  return function()
+    local items = {}
+    local f = io.open(HOME .. "/.ssh/config", "r")
+    if f then
+      for line in f:lines() do
+        local names = line:match("^%s*[Hh]ost%s+(.+)$")
+        if names and not names:find("^#") then
+          local host = names:match("^(%S+)")
+          if host and not host:find("[*?]") then
+            items[#items + 1] = {
+              name = host, g = "\u{f120}",
+              action = function()
+                hs.task.new("/usr/bin/open", nil, { "-na", "Ghostty", "--args",
+                  "--title=ssh " .. host, "--working-directory=" .. HOME,
+                  "-e", "ssh", host }):start()
+              end,
+            }
+          end
+        end
+      end
+      f:close()
+    end
+    if #items == 0 then items[1] = { name = "No hosts in ~/.ssh/config", action = function() end } end
+    return { title = "SSH", items = items }
   end
 end
 

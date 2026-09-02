@@ -18,7 +18,6 @@ local M = {}
 local HOME = os.getenv("HOME")
 
 -- Omachy sibling modules (see init.lua). No cycles: none of these require menu.
-local theme     = require("theme")
 local toggles   = require("toggles")
 local clipboard = require("clipboard")
 local pickers   = require("pickers")
@@ -71,7 +70,7 @@ local NF = {
   system = "\u{f011}", lock = "\u{f023}", logout = "\u{f08b}",
   refresh = "\u{f021}", power = "\u{f011}", back = "\u{f053}",
   shortcuts = "\u{f11c}", window = "\u{f2d0}", tmux = "\u{ebc8}", vim = "\u{e62b}",
-  search = "\u{f002}", folder = "\u{f07b}",
+  search = "\u{f002}", folder = "\u{f07b}", apple = "\u{f179}", ssh = "\u{f120}",
   toggle = "\u{f205}", insert = "\u{f040}", web = "\u{f0ac}",
   clipboard = "\u{f0ea}", record = "\u{f111}", emoji = "\u{f118}", palette = "\u{f1fc}",
 }
@@ -142,8 +141,27 @@ local APPS = { title = "Apps", g = NF.apps, items = {
 
 -- Named Ghostty windows — the replacement for the old iTerm dynamic profiles.
 -- Each is a locked title + working dir + command; see config/ghostty/launch.
+-- open a TUI in its own Ghostty window
+local function tui(name, cmd)
+  return function()
+    hs.task.new("/usr/bin/open", nil, { "-na", "Ghostty", "--args",
+      "--title=" .. name, "-e", "zsh", "-lc", cmd .. "; exec zsh -l" }):start()
+  end
+end
+
+local TUIS = { title = "TUIs", g = NF.terminal, items = {
+  { name = "btop  ·  system",     g = NF.termprompt, action = tui("btop", "btop") },
+  { name = "lazygit  ·  git",     g = NF.termprompt, action = tui("lazygit", "lazygit") },
+  { name = "lazydocker  ·  docker", g = NF.termprompt, action = tui("lazydocker", "lazydocker") },
+  { name = "k9s  ·  kubernetes",  g = NF.termprompt, action = tui("k9s", "k9s") },
+  { name = "mactop  ·  power (sudo)", g = NF.termprompt, action = tui("mactop", "sudo mactop") },
+} }
+
 local TERMINAL = { title = "Terminal", g = NF.terminal, items = {
   { name = "Open Terminal", g = NF.plus, action = shell("open -na Ghostty") },
+  { name = "SSH",   g = NF.termprompt, menu = pickers.sshMenu() },
+  { name = "TUIs",  g = NF.terminal,   menu = TUIS },
+  { header = "NAMED WINDOWS" },
   { name = "AKS-Lab (tmux cockpit)", g = NF.termprompt, action = shell("~/.config/ghostty/launch aks-lab") },
   { name = "IDE (LazyVim)",          g = NF.termprompt, action = shell("~/.config/ghostty/launch ide") },
   { name = "K8s Exam",               g = NF.termprompt, action = shell("~/.config/ghostty/launch exam") },
@@ -160,18 +178,6 @@ local CAPTURE = { title = "Capture", g = NF.capture, items = {
     action = function() require("services").toggleRecording() end },
   { name = "Recording toolbar (⌘⇧5)", g = NF.video, action = deferred(keys({ "cmd", "shift" }, "5")) },
   { name = "Digital Color Meter",   g = NF.eyedropper, action = focus("Digital Color Meter") },
-} }
-
-local function themeMenu() return { title = "Theme", items = theme.list() } end
-
-local STYLE = { title = "Style", g = NF.style, items = {
-  { name = "Theme",      g = NF.palette, menu = themeMenu },
-  { name = "Next theme", g = NF.palette, action = function() theme.cycle(1) end },
-  { name = "Dark mode",  g = NF.moon, action = setAppearance(true) },
-  { name = "Light mode", g = NF.sun,  action = setAppearance(false) },
-  { name = "Wallpaper",  g = NF.image, menu = wallpaperMenu },
-  { name = "Wallpaper settings", g = NF.cog,
-    action = openURL("x-apple.systempreferences:com.apple.Wallpaper-Settings.extension") },
 } }
 
 local SETUP = { title = "Setup", g = NF.setup, items = {
@@ -198,10 +204,6 @@ local INSERT = { title = "Insert", g = NF.insert, items = {
   { name = "Glyphs", g = NF.palette, menu = emoji.glyphMenu },
 } }
 
-local INSTALL = { title = "Install", g = NF.web, items = {
-  { name = "Web Apps", g = NF.web, menu = webapp.menu },
-} }
-
 local function clipboardMenu() return { title = "Clipboard", items = clipboard.rows() } end
 
 local SYSTEM = { title = "System", g = NF.system, items = {
@@ -218,8 +220,8 @@ local SYSTEM = { title = "System", g = NF.system, items = {
   { header = "PACKAGES" },
   { name = "Check for updates",  g = NF.refresh,
     action = function() require("services").checkUpdates(); hs.alert.show("Checking for updates…") end },
-  { name = "Upgrade packages (brew)", g = NF.refresh,
-    action = function() require("services").runUpgrade() end },
+  { name = "Update everything",  g = NF.refresh,
+    action = function() require("services").updateAll() end },
 } }
 
 -- System Settings panes, for root search. `open`ing a stale pane id just lands
@@ -449,7 +451,41 @@ local NEOVIM = { title = "NeoVim", g = NF.vim, width = 460, items = {
   shortcut("Space  g g",    "Lazygit"),
 } }
 
+local MACOS = { title = "macOS", g = NF.apple, width = 460, items = {
+  section("SYSTEM"),
+  shortcut("⌘ Space",        "Spotlight"),
+  shortcut("⌃⌘ Space",       "Emoji & symbols"),
+  shortcut("⌃⌘ Q",           "Lock screen"),
+  shortcut("⌘⌥ Esc",         "Force quit"),
+  shortcut("⌘ ,",            "App settings"),
+  shortcut("Fn Fn",          "Dictation"),
+  section("SCREENSHOTS"),
+  shortcut("⌘⇧ 3",           "Whole screen"),
+  shortcut("⌘⇧ 4",           "Selected region"),
+  shortcut("⌘⇧ 4  Space",    "A window"),
+  shortcut("⌘⇧ 5",           "Screenshot / record toolbar"),
+  shortcut("+ ⌃",            "…to clipboard instead of a file"),
+  section("WINDOWS & APPS"),
+  shortcut("⌘ Tab",          "Switch app (themed switcher)"),
+  shortcut("⌘ `",            "Cycle windows in the app"),
+  shortcut("⌘ M  /  ⌘ H",    "Minimise  ·  hide (⌘H is off in AeroSpace)"),
+  shortcut("⌘ W  /  ⌘ Q",    "Close window  ·  quit app"),
+  shortcut("⌃ ↑",            "Mission Control"),
+  section("FINDER"),
+  shortcut("⌘⇧ .",           "Toggle hidden files"),
+  shortcut("⌘⇧ G",           "Go to folder…"),
+  shortcut("⌘ ⌫",            "Move to Trash"),
+  shortcut("⌘⇧ ⌫",           "Empty Trash"),
+  shortcut("Space",          "Quick Look"),
+  section("TEXT"),
+  shortcut("⌥ ← / →",        "Move by word"),
+  shortcut("⌘ ← / →",        "Line start / end"),
+  shortcut("⌥ ⌫",            "Delete word"),
+  shortcut("⌘ ⌫",            "Delete to line start"),
+} }
+
 local SHORTCUTS = { title = "Shortcuts", g = NF.shortcuts, items = {
+  { name = "macOS",   g = NF.apple,    menu = MACOS },
   { name = "Tiling",  g = NF.window,   menu = tilingMenu },
   { name = "TMUX",    g = NF.tmux,     menu = TMUX },
   { name = "Ghostty", g = NF.terminal, menu = GHOSTTY },
@@ -460,10 +496,9 @@ local ROOT = { title = "Go", items = {
   section("LAUNCH"),
   { name = "Apps",      g = NF.apps,      menu = APPS },
   { name = "Terminal",  g = NF.terminal,  menu = TERMINAL },
-  { name = "Install",   g = NF.web,       menu = INSTALL },
+  { name = "Web Apps",  g = NF.web,       menu = webapp.menu },
   section("DESKTOP"),
   { name = "Capture",   g = NF.capture,   menu = CAPTURE },
-  { name = "Style",     g = NF.style,     menu = STYLE },
   { name = "Toggle",    g = NF.toggle,    menu = toggles.menu },
   { name = "Clipboard", g = NF.clipboard, menu = clipboardMenu },
   { name = "Insert",    g = NF.insert,    menu = INSERT },
@@ -701,8 +736,8 @@ local function buildRows()
           act   = it.act,
           kind  = it.menu and "menu" or (it.info and "info" or "action"),
           item  = it,
-          image = it.app and appIcon(it.app) or nil,
-          g     = (not it.app and not it.info) and (it.g or node.g) or nil,
+          image = it.image or (it.app and appIcon(it.app)) or nil,
+          g     = (not it.app and not it.image and not it.info) and (it.g or node.g) or nil,
         }
       end
     end
@@ -1004,6 +1039,7 @@ function M.open()
   -- don't race the modifier release, then bring it up
   local tries = 0
   local function go()
+    if not trail[1] then return end          -- closed before we came up
     local m = hs.eventtap.checkKeyboardModifiers()
     if (m.cmd or m.alt or m.ctrl or m.shift) and tries < 50 then
       tries = tries + 1
@@ -1050,6 +1086,7 @@ end
 function M.openWith(q)
   M.open()
   hs.timer.doAfter(0.28, function()
+    if not trail[1] then return end
     filter, sel, scroll = q, 1, 0
     kickFileSearch(); buildRows(); draw()
   end)
@@ -1061,7 +1098,9 @@ function M.openAt(...)
   M.open()
   hs.timer.doAfter(0.28, function()
     for _, name in ipairs(path) do
-      for _, it in ipairs(trail[#trail].items) do
+      local node = trail[#trail]
+      if not node then return end
+      for _, it in ipairs(node.items) do
         if it.name == name and it.menu then
           trail[#trail + 1] = resolve(it.menu)
           break

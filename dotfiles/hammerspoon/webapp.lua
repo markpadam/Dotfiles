@@ -1,29 +1,24 @@
--- webapp.lua — Omarchy's web2app: run a website as its own chrome-less window
--- with its own profile, launchable from the Opt+Space menu.
+-- webapp.lua — websites as quick-launch entries in Opt+Space -> Web Apps.
 --
--- Registry: ~/.local/share/omachy/webapps.json  (not tracked)
--- Profiles: ~/.local/share/omachy/webapp-profiles/<slug>
+-- Opens in Safari (a fresh window per pick, sharing your logged-in session).
+-- Safari has no Chromium-style --app / --user-data-dir, so these are ordinary
+-- Safari windows, not chrome-less .app bundles.
 --
---   Opt+Space -> Install -> Add web app…   (prompts for name + URL)
+-- Registry: ~/.local/share/omachy/webapps.json   (not tracked)
+-- Favicons: ~/.local/share/omachy/webapp-icons/<slug>.png
+--
+-- Each entry: { name, url, slug, source }. source = "homepage" marks one
+-- auto-synced from the home dashboard's /api/services (gethomepage.dev — see
+-- M.syncHomepage, runs on start + every 6h); nil = added by hand.
 
 local M = {}
 local HOME  = os.getenv("HOME")
 local DIR   = HOME .. "/.local/share/omachy"
 local STORE = DIR .. "/webapps.json"
+local ICONS = DIR .. "/webapp-icons"
+local HOMEPAGE = "https://homepage.theadamsfamily.uk/"
 
--- Chromium-family browser for --app mode; Safari is the no-app-mode fallback.
-local BROWSERS = {
-  { bid = "com.brave.Browser",  name = "Brave Browser" },
-  { bid = "com.google.Chrome",  name = "Google Chrome" },
-  { bid = "com.microsoft.edgemac", name = "Microsoft Edge" },
-}
-
-local function browser()
-  for _, b in ipairs(BROWSERS) do
-    if hs.application.pathForBundleID(b.bid) then return b end
-  end
-end
-
+-- ── store ─────────────────────────────────────────────────────────────────
 local function load()
   local f = io.open(STORE, "r")
   if not f then return {} end
@@ -37,65 +32,154 @@ local function save(list)
   if f then f:write(hs.json.encode(list)); f:close() end
 end
 
-local function slugify(s)
-  return (s:lower():gsub("[^%w]+", "-"):gsub("^-+", ""):gsub("-+$", ""))
+local function slugify(s) return (s:lower():gsub("[^%w]+", "-"):gsub("^-+", ""):gsub("-+$", "")) end
+local function domain(url) return (url:match("^https?://([^/]+)") or url) end
+
+-- ── favicons ──────────────────────────────────────────────────────────────
+-- prefer the dashboard's curated icon (homarr dashboard-icons), else the site's
+-- favicon via Google's service.
+local function iconUrl(url, hp)
+  if type(hp) == "string" and hp ~= "" then
+    if hp:match("^https?://") then return hp end
+    local png = hp:match("^(.+)%.svg$") and (hp:match("^(.+)%.svg$") .. ".png") or hp
+    if png:match("%.png$") then
+      return "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/" .. png
+    end
+  end
+  return ("https://www.google.com/s2/favicons?sz=64&domain=%s"):format(domain(url))
 end
 
-function M.launch(app)
-  local b = browser()
-  if b then
-    local profile = ("%s/webapp-profiles/%s"):format(DIR, app.slug)
-    hs.execute(("mkdir -p %q"):format(profile))
-    hs.task.new("/usr/bin/open", nil, {
-      "-na", b.name, "--args",
-      "--app=" .. app.url,
-      "--user-data-dir=" .. profile,
-      "--no-first-run",
-    }):start()
-  else
-    hs.execute("open " .. ("%q"):format(app.url))   -- Safari, plain tab
+local function fetchIcon(slug, url, hp)
+  hs.execute(("mkdir -p %q"):format(ICONS))
+  hs.task.new("/usr/bin/curl", nil, {
+    "-sL", "--max-time", "8", "-o", ("%s/%s.png"):format(ICONS, slug), iconUrl(url, hp),
+  }):start()
+end
+
+local iconCache = {}
+local function iconFor(slug)
+  if iconCache[slug] == nil then
+    local p = ("%s/%s.png"):format(ICONS, slug)
+    iconCache[slug] = (hs.fs.attributes(p) and hs.image.imageFromPath(p)) or false
   end
+  return iconCache[slug] or nil
+end
+
+-- ── launch / add / remove ─────────────────────────────────────────────────
+function M.launch(app)
+  hs.osascript.applescript(
+    ('tell application "Safari"\nactivate\nmake new document with properties {URL:%q}\nend tell')
+      :format(app.url))
 end
 
 function M.add()
   local ok1, name = hs.dialog.textPrompt("New web app", "Name", "", "Next", "Cancel")
   if ok1 ~= "Next" or name == "" then return end
-  local ok2, url = hs.dialog.textPrompt("New web app", "URL for " .. name,
-    "https://", "Add", "Cancel")
+  local ok2, url = hs.dialog.textPrompt("New web app", "URL for " .. name, "https://", "Add", "Cancel")
   if ok2 ~= "Add" or not url:match("^https?://") then
     if ok2 == "Add" then hs.alert.show("web app: URL must start with http(s)://") end
     return
   end
+  local slug = slugify(name)
   local list = load()
-  list[#list + 1] = { name = name, url = url, slug = slugify(name) }
-  save(list)
+  list[#list + 1] = { name = name, url = url, slug = slug }
+  save(list); fetchIcon(slug, url)
   hs.alert.show("\u{f0ac}  Added " .. name)
 end
 
 function M.remove(slug)
-  local list, out = load(), {}
-  for _, a in ipairs(list) do if a.slug ~= slug then out[#out + 1] = a end end
-  save(out)
+  local out = {}
+  for _, a in ipairs(load()) do if a.slug ~= slug then out[#out + 1] = a end end
+  save(out); iconCache[slug] = nil
 end
 
+-- ── sync from the home dashboard ──────────────────────────────────────────
+-- Read homepage's /api/services (gethomepage.dev) and keep the
+-- `source = "homepage"` entries in step with it — add new services, drop ones
+-- that have gone. Hand-added entries are never touched.
+function M.syncHomepage(cb)
+  hs.task.new("/usr/bin/curl", function(_, body)
+    local ok, groups = pcall(hs.json.decode, body or "")
+    if not ok or type(groups) ~= "table" then if cb then cb(false, 0) end; return end
+
+    local svc, order = {}, {}         -- url -> { name, icon }
+    for _, grp in ipairs(groups) do
+      for _, s in ipairs(grp.services or {}) do
+        local url = s.href
+        if type(url) == "string" and url:match("^https?://") and not svc[url] then
+          svc[url] = { name = s.name or domain(url), icon = s.icon }
+          order[#order + 1] = url
+        end
+      end
+    end
+
+    local list, kept, changed = load(), {}, false
+    for _, a in ipairs(list) do
+      if a.source ~= "homepage" then kept[#kept + 1] = a
+      elseif svc[a.url] then kept[#kept + 1] = a; svc[a.url] = nil
+      else changed = true end                          -- gone from the dashboard
+    end
+    for _, url in ipairs(order) do
+      local s = svc[url]
+      if s then
+        local slug = "hp-" .. slugify(s.name)
+        kept[#kept + 1] = { name = s.name, url = url, slug = slug, source = "homepage" }
+        fetchIcon(slug, url, s.icon)
+        changed = true
+      end
+    end
+    if changed then save(kept) end
+    if cb then cb(changed, #order) end
+  end, { "-sL", "--max-time", "12", HOMEPAGE .. "api/services" }):start()
+end
+
+-- ── menu ──────────────────────────────────────────────────────────────────
 function M.menu()
   local list = load()
-  local items = {}
-  for _, a in ipairs(list) do
-    items[#items + 1] = { name = a.name, g = "\u{f0ac}", action = function() M.launch(a) end }
-  end
+  local items = {
+    { name = "Add web app…",     g = "\u{f0fe}", action = M.add },
+    { name = "Sync home dashboard", g = "\u{f021}", action = function()
+      M.syncHomepage(function(ch, n) hs.alert.show(("Home dashboard: %d services%s")
+        :format(n, ch and ", updated" or "")) end)
+    end },
+  }
   if #list > 0 then items[#items + 1] = { header = "" } end
-  items[#items + 1] = { name = "Add web app…", g = "\u{f0fe}", action = M.add }
+  for _, a in ipairs(list) do
+    local img = iconFor(a.slug)
+    if not img then fetchIcon(a.slug, a.url) end
+    items[#items + 1] = {
+      name = a.name, image = img, g = img and nil or "\u{f0ac}",
+      action = function() M.launch(a) end,
+    }
+  end
   if #list > 0 then
     local rm = {}
     for _, a in ipairs(list) do
-      rm[#rm + 1] = { name = a.name, action = function()
-        M.remove(a.slug); hs.alert.show("Removed " .. a.name)
-      end }
+      rm[#rm + 1] = { name = a.name .. (a.source == "homepage" and "  (auto)" or ""),
+        action = function() M.remove(a.slug); hs.alert.show("Removed " .. a.name) end }
     end
+    items[#items + 1] = { header = "" }
     items[#items + 1] = { name = "Remove web app", g = "\u{f014}", menu = { title = "Remove", items = rm } }
   end
   return { title = "Web Apps", items = items }
+end
+
+-- ── seed + periodic sync ──────────────────────────────────────────────────
+function M.start()
+  local list, have = load(), {}
+  for _, a in ipairs(list) do have[a.slug] = true end
+  for _, seed in ipairs({
+    { name = "Messenger",      url = "https://www.messenger.com/", slug = "messenger" },
+    { name = "Home Dashboard", url = HOMEPAGE,                     slug = "home-dashboard" },
+  }) do
+    if not have[seed.slug] then
+      list[#list + 1] = seed
+      fetchIcon(seed.slug, seed.url)
+    end
+  end
+  save(list)
+  M.syncHomepage()
+  M._timer = hs.timer.new(6 * 60 * 60, function() M.syncHomepage() end, true):start()
 end
 
 return M

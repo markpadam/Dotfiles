@@ -46,9 +46,11 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 on-focused-monitor-changed = []
 on-focus-changed = []
 
-# ── Sketchybar integration ────────────────────────────────────────────────────
+# ── Sketchybar + Hammerspoon integration ─────────────────────────────────────
+# Also drop the workspace name in ~/.cache/omachy/workspace — Hammerspoon
+# pathwatches it to flash the name on screen (dotfiles/hammerspoon/wsflash.lua).
 exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE; mkdir -p "$HOME/.cache/omachy"; printf %s "$AEROSPACE_FOCUSED_WORKSPACE" > "$HOME/.cache/omachy/workspace"'
 ]
 
 # ── Key mapping ───────────────────────────────────────────────────────────────

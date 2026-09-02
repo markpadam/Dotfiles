@@ -17,7 +17,7 @@ local BREW = "/opt/homebrew/bin/brew"
 M.wallpaperRotate = false   -- rotate to a random wallpaper on unlock
 M.windowFlash     = false   -- accent outline that fades in on every new window
 
-local upTimer, mediaTimer, wake, wf, recTask, startedAt
+local upTimer, mediaTimer, vpnTimer, wake, wf, recTask, startedAt
 
 local function sbSet(item, ...)
   local a = { "--set", item }
@@ -34,12 +34,45 @@ local function checkUpdates()
 end
 M.checkUpdates = checkUpdates
 
-function M.runUpgrade()
+-- ── VPN state ──────────────────────────────────────────────────────────────
+-- NordVPN has no CLI on macOS, so: a scutil-managed VPN that's Connected
+-- (WireGuard "Home", Teleport), or the default route on a utun with NordVPN
+-- running. Click the pill -> open NordVPN.
+local function checkVPN()
+  hs.task.new("/bin/sh", function(_, out)
+    local defif, sc = (out or ""):match("([^|]*)|([^|]*)")
+    local name
+    if sc and sc ~= "" then
+      name = (sc:gsub("%s*%b()", ""))                 -- "Home (WireGuard)" -> "Home"
+    elseif defif and defif:match("^utun") then
+      name = "NordVPN"
+    end
+    sbSet("hsq.vpn", "icon=\u{f023}", "label=" .. (name or ""),
+      "drawing=" .. (name and "on" or "off"))
+  end, { "-c", [[
+    export PATH=/usr/sbin:/sbin:/usr/bin:/bin
+    defif=$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')
+    nord=$(pgrep -x NordVPN >/dev/null 2>&1 && echo 1)
+    sc=$(scutil --nc list 2>/dev/null | awk -F'"' '/\(Connected\)/{print $2; exit}')
+    [ -z "$sc" ] && [ "$defif" != "${defif#utun}" ] && [ -z "$nord" ] && defif=""
+    echo "$defif|$sc"
+  ]] }):start()
+end
+M.checkVPN = checkVPN
+
+-- brew upgrade + pull the dotfiles + reload the stack, in a Ghostty window
+function M.updateAll()
   hs.task.new("/usr/bin/open", nil, {
-    "-na", "Ghostty", "--args", "--title=brew upgrade",
-    "-e", "zsh", "-lc", "brew upgrade; brew cleanup; echo; echo done; exec zsh -l",
+    "-na", "Ghostty", "--args", "--title=omachy update", "-e", "zsh", "-lc",
+    table.concat({
+      "echo; echo '== brew =='; brew upgrade; brew cleanup",
+      "echo; echo '== dotfiles =='; git -C ~/.dotfiles pull --rebase --autostash",
+      "echo; echo '== reload =='; aerospace reload-config; sketchybar --reload; hs -c 'hs.reload()'",
+      "echo; echo '== done =='; exec zsh -l",
+    }, "; "),
   }):start()
 end
+M.runUpgrade = M.updateAll   -- old name
 
 -- ── now playing ────────────────────────────────────────────────────────────
 local function nowPlaying()
@@ -141,8 +174,11 @@ function M.start()
   nowPlaying()
   mediaTimer = hs.timer.new(5, nowPlaying, true):start()
 
+  checkVPN()
+  vpnTimer = hs.timer.new(12, checkVPN, true):start()
+
   wake = hs.caffeinate.watcher.new(function(ev)
-    if ev == hs.caffeinate.watcher.screensDidWake then checkUpdates() end
+    if ev == hs.caffeinate.watcher.screensDidWake then checkUpdates(); checkVPN() end
     if ev == hs.caffeinate.watcher.screensDidUnlock then rotateWallpaper() end
   end)
   wake:start()
@@ -154,10 +190,10 @@ function M.start()
 end
 
 function M.stop()
-  for _, t in ipairs({ upTimer, mediaTimer }) do if t then t:stop() end end
+  for _, t in ipairs({ upTimer, mediaTimer, vpnTimer }) do if t then t:stop() end end
   if wake then wake:stop(); wake = nil end
   if wf then wf:unsubscribeAll(); wf = nil end
-  upTimer, mediaTimer = nil, nil
+  upTimer, mediaTimer, vpnTimer = nil, nil, nil
 end
 
 return M

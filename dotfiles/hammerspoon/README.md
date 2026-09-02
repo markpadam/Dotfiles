@@ -41,12 +41,21 @@ clipboard.lua   clipboard history (Ctrl+Alt+V)
 idle.lua        dim-then-lock idle progression (hypridle)
 services.lua    brew-update count, now-playing, screen recording, window flash
 whichkey.lua    hold ⌥ → cheatsheet (macOS / Hammerspoon / AeroSpace / nvim / tmux)
-switcher.lua    themed Cmd+Tab (hs.window.switcher; needs the Karabiner remap)
+switcher.lua    themed Cmd+Tab (menu-style list; needs the Karabiner remap)
 dock.lua        themed left-edge dock — the macOS one can't be re-coloured
-pickers.lua     audio / Bluetooth / Wi-Fi device pickers for the menu
-webapp.lua      run a website as its own app window (web2app)
+wsflash.lua     centre flash of the workspace name on switch (Hyprland-style)
+pickers.lua     audio / Bluetooth / Wi-Fi / SSH pickers for the menu
+webapp.lua      websites as Safari quick-launch; auto-syncs the home dashboard
 emoji.lua       emoji + Nerd-Font-glyph picker
 ```
+
+`wsflash.lua` reads `~/.cache/omachy/workspace`, which `aerospace.toml`'s
+`exec-on-workspace-change` writes. `webapp.lua` pulls the home dashboard's
+`/api/services` (gethomepage.dev) on start + every 6h and keeps a web-app entry
+per service (`source = "homepage"`, pruned when a service goes); hand-added
+entries via **Web Apps ▸ Add web app…** are left alone. The `SketchyBar`
+`hsq.vpn` glyph shows when a VPN is up (scutil-managed, or a `utun` default
+route with NordVPN running).
 
 Reload: `hs -c 'hs.reload()'`. **`hs -c` hangs on canvas/eventtap code** — use
 `hs -t 5 -c '…'` when poking at menu / osd / whichkey.
@@ -56,7 +65,6 @@ Reload: `hs -c 'hs.reload()'`. **`hs -c` hangs on canvas/eventtap code** — use
 | Key | Does |
 | --- | --- |
 | `⌥ Space` | Command menu |
-| `⌃⌥ Space` | Next theme |
 | `⌘ Tab` | Themed window switcher (via the Karabiner remap — see below) |
 | `⌃\`` / `⌃⌥ T` | Toggle the scratchpad terminal |
 | `⌃⌥ V` | Clipboard history |
@@ -132,17 +140,25 @@ Nerd Font codepoints stay out of the shell file.
 
 ## The command menu (`menu.lua`)
 
-Unchanged engine (sharp `hs.canvas` panel, eventtap owns the keyboard, titled
-sections, root Raycast-style search). New branches:
+Rounded `hs.canvas` panel, eventtap owns the keyboard, titled sections, root
+Raycast-style search. Branches:
 
-- **Style ▸ Theme** — the 8 themes, ✓ on the active one. **Style ▸ Next theme.**
+- **Terminal** — Open Terminal, **SSH** (`~/.ssh/config` hosts → a Ghostty ssh
+  window), **TUIs** (btop / lazygit / lazydocker / k9s / mactop), the named
+  windows (AKS-Lab / IDE / …).
+- **Web Apps** — Add web app…, Sync home dashboard, then each web app by its
+  favicon, plus Remove.
 - **Toggle** — Zen / keep-awake / DND / Night Shift / bar / borders.
 - **Clipboard** — history, newest first, paste on pick (also `⌃⌥ V`).
 - **Insert** — Emoji, Glyphs (typed into the focused field).
 - **Setup** — Audio output/input, Bluetooth, Wi-Fi device pickers (live lists).
-- **Install ▸ Web Apps** — add / launch / remove `--app` browser windows.
 - **Capture ▸ Start / stop recording** — `screencapture -v`, tracked, `hsq.rec`.
-- **System ▸ Packages** — check for updates, `brew upgrade` in a Ghostty window.
+- **Shortcuts ▸ macOS** — a reference sheet of the common system chords.
+- **System ▸ Packages ▸ Update everything** — `brew upgrade` + `git pull` the
+  dotfiles + reload AeroSpace / SketchyBar / Hammerspoon, in a Ghostty window.
+
+The theme switcher stays in `theme.lua` (it powers every panel's colours) but
+is no longer in the menu — the theme is settled.
 
 Deep entry points still work: `require("menu").openAt("Clipboard")`,
 `.openWith("brave")`, `.run("Capture", "Selection → clipboard")`.

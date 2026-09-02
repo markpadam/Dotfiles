@@ -59,6 +59,8 @@ local services  = require("services")
 local whichkey  = require("whichkey")
 local switcher  = require("switcher")
 local dock      = require("dock")
+local wsflash   = require("wsflash")
+local webapp    = require("webapp")
 
 -- Command menu on the Raycast slot (Opt+Space). Tree in menu.lua.
 menu.bind({ "alt" }, "space")
@@ -70,7 +72,6 @@ local function map(mods, key, fn, desc)
     (mods[1] == "ctrl" and "⌃⌥ " or "⌥ ") .. (key == "`" and "`" or key:upper()), desc)
 end
 
-map({ "ctrl", "alt" }, "space", function() theme.cycle(1) end, "Next theme")
 map({ "ctrl", "alt" }, "t",     function() scratchpad.toggle() end, "Scratchpad terminal")
 scratchpad.bind({ "ctrl" }, "`")   -- Quake-style, second binding
 map({ "ctrl", "alt" }, "v",     function() menu.openAt("Clipboard") end, "Clipboard history")
@@ -86,6 +87,8 @@ clipboard.start()
 whichkey.start()
 switcher.start()
 dock.start()
+wsflash.start()
+webapp.start()
 services.start()
 idle.start()
 

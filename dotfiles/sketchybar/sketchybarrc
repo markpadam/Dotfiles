@@ -176,9 +176,10 @@ sketchybar --add item memory right \
 #   updates  brew outdated count             dnd       Do Not Disturb
 #   rec      screen recording                zen       Zen mode
 #   borders  borders hidden                  nightshift Night Shift
+#   vpn      VPN connected (services.lua)
 # The glyph (icon=) is set from the Lua side so the Nerd Font codepoints never
 # have to live in this file.
-for q in media updates rec borders nightshift zen dnd caffeine; do
+for q in media updates vpn rec borders nightshift zen dnd caffeine; do
     sketchybar --add item hsq.$q right \
         --set hsq.$q drawing=off \
             icon.font="Hack Nerd Font Mono:Regular:12.0" \
@@ -189,6 +190,7 @@ for q in media updates rec borders nightshift zen dnd caffeine; do
 done
 sketchybar --set hsq.rec icon.color="$BAR_RED"
 sketchybar --set hsq.updates icon.color="$BAR_YELLOW"
+sketchybar --set hsq.vpn icon.color="$BAR_GREEN" click_script="open -a NordVPN"
 
 # ── Notch: two islands on the built-in, one bar on external displays ──────────
 # Left- and right-hand background pills. Drawn only when the bar is on the
@@ -204,7 +206,7 @@ sketchybar --add bracket left_island '/space\..*/' front_app \
         background.drawing=off
 
 sketchybar --add bracket right_island clock battery volume cpu memory \
-        hsq.media hsq.updates hsq.rec hsq.borders hsq.nightshift hsq.zen hsq.dnd hsq.caffeine \
+        hsq.media hsq.updates hsq.vpn hsq.rec hsq.borders hsq.nightshift hsq.zen hsq.dnd hsq.caffeine \
     --set right_island \
         background.color="$BAR_ISLAND"  \
         background.corner_radius=8      \

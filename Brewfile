@@ -64,6 +64,10 @@ brew "kubernetes-cli"
 brew "kubernetes-cli@1.32"
 # Simple terminal UI for git commands
 brew "lazygit"
+# The lazier way to manage everything docker (TUI)
+brew "lazydocker"
+# Apple Silicon CPU/GPU/power monitor (TUI, needs sudo)
+brew "mactop"
 # Run a Kubernetes cluster locally
 brew "minikube"
 # Ambitious Vim-fork focused on extensibility and agility
