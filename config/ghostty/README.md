@@ -30,10 +30,17 @@ multiplexes inside them.
 
 ### Colours
 
-`config-file = ?wallust.conf` optionally pulls in a wallpaper-derived palette
-from `config/wallust/` (the `?` = no error if it hasn't been generated). Those
-`background` / `palette` keys override `theme = Catppuccin Mocha`.
-`wallust.conf` is `.gitignore`d — it lands in this dir via the symlink.
+Two optional includes, later ones win, so `theme = Catppuccin Mocha` is just
+the fallback:
+
+- `?theme.conf` — written by the Hammerspoon theme switcher
+  (`dotfiles/hammerspoon/theme.lua`); this is the live source of truth. It's the
+  **last** `config-file` line, so the switcher always wins.
+- `?wallust.conf` — older wallpaper-derived palette from `config/wallust/`.
+
+Both are `.gitignore`d (they land in this dir via the symlink). After a theme
+switch the switcher triggers Ghostty's **Reload Configuration** itself; new
+windows pick it up regardless.
 
 ## Named windows — `./launch`
 

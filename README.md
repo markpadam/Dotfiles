@@ -32,7 +32,7 @@ bash ~/.dotfiles/macos/defaults.sh
 | Path | What it is |
 |---|---|
 | `bootstrap.sh` | Entry point — clone/update, install, link |
-| `Brewfile` | 10 taps, 43 formulae, 14 casks, 2 npm globals |
+| `Brewfile` | 10 taps, 54 formulae, 14 casks, 2 npm globals |
 | `install/macos.sh` | `brew bundle install` wrapper |
 | `install/shell.sh` | oh-my-zsh + zsh plugins (prompt is Starship) |
 | `install/vscode.sh` | Reinstalls VS Code extensions |
@@ -63,8 +63,8 @@ Each tool below has a `README.md` next to its config with the settings and
 gotchas; these bullets are just the map.
 
 - **AeroSpace** (`dotfiles/aerospace/`) — tiling window manager on its stock
-  `alt`-prefixed bindings. Six named workspaces on `alt-1`..`alt-6` —
-  `desktop` / `terminal` / `browser` / `comms` / `man` / `aks-lab` — shown as
+  `alt`-prefixed bindings. Five named workspaces on `alt-1`..`alt-5` —
+  `desktop` / `terminal` / `browser` / `comms` / `aks-lab` — shown as
   SketchyBar pills; a list of always-floating apps; `alt--` / `alt-=` resize
   (no mouse-drag resize, by design). On login the workspace apps are
   relaunched (`after-startup-command`) and `on-window-detected` rules route
@@ -76,22 +76,23 @@ gotchas; these bullets are just the map.
   built-in.
 - **JankyBorders** (`dotfiles/borders/`) — mauve "glow" border on the focused
   window.
-- **AutoRaise** (`config/AutoRaise/`) — focus-follows-mouse, with raise. Hold
-  Control to suspend it.
-- **Hammerspoon** (`dotfiles/hammerspoon/init.lua`) — auto-hides the menu bar
-  when a wired external display is connected. Nothing else. Linked to
-  `~/.hammerspoon/init.lua` by an explicit line in `bootstrap.sh` (Hammerspoon
-  does not read `~/.config`).
-- **Raycast** (`raycast/scripts/`) — launcher; Script Commands only, restored
-  from git history (`a12c1ef`).
+- **Hammerspoon** (`dotfiles/hammerspoon/`) — the Linux-desktop glue macOS
+  lacks. Auto-hides the menu bar on a wired external display; the **Omachy
+  command menu** (`menu.lua`, `hs.canvas` modal on `Opt+Space`); a
+  **whole-desktop theme switcher** (`theme.lua` — Ghostty, SketchyBar,
+  JankyBorders, prompt, bat, btop, k9s, nvim, wallpaper together, `⌃⌥Space` to
+  cycle); a volume/brightness **OSD**; a **Quake terminal** (`⌃\``); **Zen
+  mode** and toggles; **clipboard history**; a **which-key** overlay; idle
+  dim-then-lock; and SketchyBar state glyphs (updates count, now-playing,
+  recording). Its README has the full map. `bootstrap.sh` links every `*.lua`
+  in the dir into `~/.hammerspoon/` (Hammerspoon does not read `~/.config`).
 - **Karabiner-Elements** (`snapshots/karabiner/`) — now only declares the
   keyboard as ANSI. The Caps Lock → Ctrl+Option hyper key it used to provide
   was retired on 30 August 2026 (`f5e684a`) when AeroSpace moved to its native
   `alt` bindings. A candidate for removal.
 
-Raycast's hotkey and the Accessibility grants (AeroSpace, AutoRaise,
-Hammerspoon) are manual GUI steps that `bootstrap.sh` cannot do — macOS
-requires a human click for each.
+The Accessibility grants (AeroSpace, Hammerspoon) are manual GUI steps that
+`bootstrap.sh` cannot do — macOS requires a human click for each.
 
 ## Terminal, toolchains, theming
 
@@ -100,31 +101,35 @@ setup that phases A-E didn't cover:
 
 Each has a `README.md` next to its config.
 
-- **WezTerm** (`config/wezterm/`) — the terminal emulator. Deliberately no
-  leader/split keys: AeroSpace tiles windows, tmux multiplexes inside them.
-  wallust palette if present, else the built-in Catppuccin Mocha scheme.
+- **Ghostty** (`config/ghostty/`) — the terminal emulator (one of Omarchy's
+  four supported). Titlebar hidden, no tabs/splits — AeroSpace tiles windows,
+  tmux multiplexes inside them. `theme.conf` (written by the Hammerspoon theme
+  switcher) is the last `config-file` include and sets the palette.
+  `config/ghostty/launch` opens the named windows (AKS-Lab / IDE / K8s Exam /
+  PowerShell / Ubuntu — the old iTerm profiles), wired into the Hammerspoon menu.
 - **tmux** (`dotfiles/.tmux.conf`) — prefix `C-b`, TPM plugins, a Dracula
   status bar, `v`/`x` splits, `h/j/k/l` pane moves. `config/omachy/dev-session.sh`
   builds a preset session on top of it.
 - **Shell** (`dotfiles/.zshrc`) — zsh + oh-my-zsh (plugins only, no theme).
   The "Omachy managed" block at the end wires **Starship** (prompt,
   `config/starship.toml`, replaced powerlevel10k on 30 August 2026), `fzf`,
-  `atuin`, vi mode, `fastfetch`, and the `dev` function (`config/omachy/`).
+  `atuin`, `zoxide` (`cd`), `eza` (`ls`/`ll`/`la`/`lt`), `bat` (`cat`), vi
+  mode, `fastfetch`, and the `dev` function (`config/omachy/`).
 - **mise** (`config/mise/`) — Node/Python/Go/Rust versions. Needs
   `eval "$(mise activate zsh)"`, which `.zshrc` does after the profile.d loop.
-- **wallust** (`config/wallust/`) — generates a palette from the wallpaper.
-  **Not in Homebrew core** (`chenrui333/tap/wallust`, `trusted: true`).
-  Untested against the installed version — see its README before relying on it.
+- **Theming** — the Hammerspoon **theme switcher** (`dotfiles/hammerspoon/
+  theme.lua`, 8 themes, `⌃⌥Space` to cycle) re-skins Ghostty, SketchyBar,
+  JankyBorders, Starship, bat, btop, k9s, Neovim and the wallpaper from one
+  curated palette. Generated files (`theme.conf`, `theme.sh`,
+  `omachy-theme.txt`) are `.gitignore`d.
+- **wallust** (`config/wallust/`) — superseded by the theme switcher; kept for
+  the odd manual `wallust run`. **Not in Homebrew core**
+  (`chenrui333/tap/wallust`, `trusted: true`).
 
 ### `config/` → `~/.config`
 
-`nvim/` (LazyVim) · `fish/` · `powershell/` · `git/` · `AutoRaise/` ·
-`wezterm/` · `wallust/` · `mise/` · `omachy/` · `starship.toml`
-
-`AutoRaise` needs an Accessibility grant made by hand the first time (System
-Settings → Privacy & Security → Accessibility) before `brew services start`
-does anything useful. macOS pins that grant to the **versioned Cellar path**,
-so a `brew upgrade` silently revokes it. See `config/AutoRaise/README.md`.
+`nvim/` (LazyVim) · `fish/` · `powershell/` · `git/` · `ghostty/` ·
+`wallust/` · `mise/` · `omachy/` · `starship.toml`
 
 ### `snapshots/` → copied, not linked
 

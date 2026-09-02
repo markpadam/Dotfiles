@@ -28,6 +28,8 @@ $cmd_duration\
 $line_break\
 $character"""
 
+# palette is rewritten by the Hammerspoon theme switcher (dotfiles/hammerspoon/
+# theme.lua). Extra palettes for the non-Catppuccin themes are at end of file.
 palette = 'catppuccin_mocha'
 
 [os]
@@ -276,3 +278,85 @@ surface0 = "#363a4f"
 base = "#24273a"
 mantle = "#1e2030"
 crust = "#181926"
+
+# ── Themes for the Hammerspoon theme switcher (theme.lua) ──────────────────
+# Only the keys the format string above references need to be right:
+# red / peach / yellow / green / sapphire / lavender / crust (+ a few spares).
+
+[palettes.tokyo_night]
+red = "#f7768e"
+peach = "#ff9e64"
+yellow = "#e0af68"
+green = "#9ece6a"
+sapphire = "#7dcfff"
+lavender = "#bb9af7"
+crust = "#1a1b26"
+text = "#c0caf5"
+base = "#1a1b26"
+mauve = "#bb9af7"
+blue = "#7aa2f7"
+
+[palettes.everforest]
+red = "#e67e80"
+peach = "#e69875"
+yellow = "#dbbc7f"
+green = "#a7c080"
+sapphire = "#7fbbb3"
+lavender = "#d699b6"
+crust = "#272e33"
+text = "#d3c6aa"
+base = "#272e33"
+mauve = "#d699b6"
+blue = "#7fbbb3"
+
+[palettes.gruvbox]
+red = "#fb4934"
+peach = "#fe8019"
+yellow = "#fabd2f"
+green = "#b8bb26"
+sapphire = "#83a598"
+lavender = "#d3869b"
+crust = "#1d2021"
+text = "#ebdbb2"
+base = "#282828"
+mauve = "#d3869b"
+blue = "#83a598"
+
+[palettes.nord]
+red = "#bf616a"
+peach = "#d08770"
+yellow = "#ebcb8b"
+green = "#a3be8c"
+sapphire = "#88c0d0"
+lavender = "#b48ead"
+crust = "#2e3440"
+text = "#eceff4"
+base = "#2e3440"
+mauve = "#b48ead"
+blue = "#81a1c1"
+
+[palettes.rose_pine]
+red = "#eb6f92"
+peach = "#f6c177"
+yellow = "#f6c177"
+green = "#9ccfd8"
+sapphire = "#9ccfd8"
+lavender = "#c4a7e7"
+crust = "#191724"
+text = "#e0def4"
+base = "#191724"
+mauve = "#c4a7e7"
+blue = "#31748f"
+
+[palettes.kanagawa]
+red = "#e82424"
+peach = "#ffa066"
+yellow = "#e6c384"
+green = "#98bb6c"
+sapphire = "#7fb4ca"
+lavender = "#957fb8"
+crust = "#1f1f28"
+text = "#dcd7ba"
+base = "#1f1f28"
+mauve = "#957fb8"
+blue = "#7e9cd8"

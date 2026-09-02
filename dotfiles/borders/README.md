@@ -1,8 +1,7 @@
 # JankyBorders
 
 Draws a coloured border around the focused window so it is obvious which one has
-keyboard focus — the visual half of the AeroSpace tiling setup (AutoRaise moves
-focus with the pointer, this shows you where it landed).
+keyboard focus — the visual half of the AeroSpace tiling setup.
 
 The Apple Notes wiki holds the overview. This file is the config reference.
 
@@ -36,6 +35,14 @@ inactive_color=0xff313244          # surface0   — unfocused windows
 
 `glow(...)` gives the focused window a soft outer bloom rather than a flat
 stroke — the "purple glow" the Omarchy look calls for.
+
+### Colours follow the theme switcher
+
+`active_color` / `inactive_color` are set in `bordersrc` as Catppuccin Mocha
+defaults, then overridden by `~/.config/borders/theme.sh` if present. The
+Hammerspoon theme switcher (`dotfiles/hammerspoon/theme.lua`) writes that file
+**and** pushes the colours to the running daemon live (`borders active_color=…`),
+so a theme swap needs no restart. `theme.sh` is `.gitignore`d.
 
 ## Width is centred on the window frame
 

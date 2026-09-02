@@ -5,14 +5,23 @@
 # AeroSpace no longer sets border colours imperatively — see the
 # after-startup-command in aerospace.toml.
 # Palette: Catppuccin Mocha, matching SketchyBar / Ghostty / the shell prompt.
+# Colours: defaults are Catppuccin Mocha. The Hammerspoon theme switcher
+# (dotfiles/hammerspoon/theme.lua) writes ~/.config/borders/theme.sh with
+# active_color / inactive_color for the current theme and also pushes them to
+# the running daemon live; sourcing it here keeps the colour across a daemon
+# restart. .gitignore'd.
+active_color="glow(0xffcba6f7)"   # mauve glow — focused window
+inactive_color=0xff313244          # surface0   — unfocused windows
+[ -r "$HOME/.config/borders/theme.sh" ] && . "$HOME/.config/borders/theme.sh"
+
 options=(
 	style=round
 	width=6.0
 	# hidpi=on renders the border at native resolution; hidpi=off draws it at
 	# 1x and scales up, which reads soft on this Retina display.
 	hidpi=on
-	active_color="glow(0xffcba6f7)"   # mauve glow — focused window
-	inactive_color=0xff313244          # surface0   — unfocused windows
+	active_color="$active_color"
+	inactive_color="$inactive_color"
 )
 
 borders "${options[@]}"

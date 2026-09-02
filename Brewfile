@@ -1,12 +1,12 @@
 tap "asmvik/formulae"
 tap "derailed/k9s"
-tap "dimentium/autoraise"
 tap "felixkratz/formulae", "https://github.com/FelixKratz/homebrew-formulae"
 tap "fluxcd/tap"
 tap "gitmichaelqiu/tap"
 tap "hashicorp/tap"
 tap "johnmatthewtennant/tap"
 tap "nikitabobko/tap", trusted: { casks: ["aerospace"] }
+tap "smudge/smudge"
 tap "ubuntu/microk8s"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
@@ -16,12 +16,28 @@ brew "ansible"
 brew "argo"
 # GitOps Continuous Delivery for Kubernetes
 brew "argocd"
+# Improved shell history for zsh, bash, fish and nushell
+brew "atuin"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Microsoft Azure CLI 2.0
 brew "azure-cli"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Resource monitor — themed by the Hammerspoon theme switcher
+brew "btop"
+# Get/set Bluetooth power and discoverable state (Opt+Space Bluetooth picker)
+brew "blueutil"
+# CLI to change macOS audio source (Opt+Space audio picker)
+brew "switchaudio-osx"
+# Control macOS Night Shift from the CLI (Opt+Space / Ctrl+Alt+N toggle)
+brew "smudge/smudge/nightlight"
 # Day 0 tool for getting your app on Kubernetes fast
 brew "draft"
+# Modern, maintained replacement for ls
+brew "eza"
+# Like neofetch, but much faster because written mostly in C
+brew "fastfetch"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
 # Command-line fuzzy finder written in Go
@@ -84,6 +100,8 @@ brew "vim"
 brew "wakeonlan"
 # Send scripted macOS notifications from the command line
 brew "terminal-notifier"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
 # UNIX shell (command interpreter)
 brew "zsh"
 # Real-time type-ahead completion for Zsh
@@ -92,8 +110,6 @@ brew "zsh-autocomplete"
 brew "zsh-autosuggestions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
-# Focus follows mouse for macOS
-brew "dimentium/autoraise/autoraise"
 # A window border system for macOS
 brew "felixkratz/formulae/borders", trusted: true
 # Highly customizable macOS status bar
@@ -119,7 +135,6 @@ cask "mark-text"
 # Orchestrates virtual Ubuntu instances
 cask "multipass"
 cask "powershell"
-cask "raycast"
 # Fast, native, feature-rich terminal emulator (an Omarchy default)
 cask "ghostty"
 # --- casks present in /opt/homebrew/Caskroom but missed by `brew bundle dump` ---

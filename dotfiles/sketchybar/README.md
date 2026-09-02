@@ -29,6 +29,22 @@ Scripts must keep their **exec bit** — the repo sets `core.fileMode = false`,
 so add any new plugin with `git update-index --chmod=+x` or the daemon cannot
 run it.
 
+### Theming
+
+Every colour in `sketchybarrc` is a `BAR_*` shell var with a Catppuccin Mocha
+default. The Hammerspoon theme switcher (`dotfiles/hammerspoon/theme.lua`)
+writes `$CONFIG_DIR/theme.sh` with overrides for the active theme and runs
+`sketchybar --reload`; `plugins/notch_islands.sh` sources it too (for the
+external-display bar colour). `theme.sh` is `.gitignore`d.
+
+### Hammerspoon state items
+
+`sketchybarrc` adds hidden `hsq.*` items — `media` (now playing), `updates`
+(`brew outdated` count), `rec` (recording), `caffeine` / `dnd` / `zen` /
+`nightshift` / `borders` (toggle state). Hammerspoon sets their `icon` +
+`drawing` at runtime (`toggles.lua` / `services.lua`), so the Nerd Font
+codepoints never touch this shell file.
+
 ### Layout
 
 `sketchybarrc` shares the **Opt+Space command menu**'s palette

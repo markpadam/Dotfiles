@@ -3,10 +3,16 @@
 # what used to be iTerm dynamic profiles) are launched by ./launch, wired into
 # the Hammerspoon menu (Opt+Space -> Terminal). See README.md.
 
-# Theme — wallust.conf (generated from the wallpaper by config/wallust/, and
-# .gitignore'd) overrides this when present; the ? makes the include optional.
+# Theme. Both includes are optional (`?`) and later ones win, so the base
+# `theme =` here is just the fallback:
+#   theme.conf   — written by the Hammerspoon theme switcher (dotfiles/
+#                  hammerspoon/theme.lua); this is the live source of truth.
+#   wallust.conf — wallpaper-derived palette from config/wallust/ (older,
+#                  unproven; kept for the odd manual `wallust run`).
+# Both are .gitignore'd. theme.conf is last so the switcher always wins.
 theme = Catppuccin Mocha
 config-file = ?wallust.conf
+config-file = ?theme.conf
 
 # Font
 font-family = JetBrains Mono

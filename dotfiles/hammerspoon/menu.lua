@@ -17,6 +17,14 @@
 local M = {}
 local HOME = os.getenv("HOME")
 
+-- Omachy sibling modules (see init.lua). No cycles: none of these require menu.
+local theme     = require("theme")
+local toggles   = require("toggles")
+local clipboard = require("clipboard")
+local pickers   = require("pickers")
+local webapp    = require("webapp")
+local emoji     = require("emoji")
+
 -- ── action helpers ─────────────────────────────────────────────────────────
 local function focus(app)     return function() hs.application.launchOrFocus(app) end end
 local function focusID(bid)    return function() hs.application.launchOrFocusByBundleID(bid) end end
@@ -64,6 +72,8 @@ local NF = {
   refresh = "\u{f021}", power = "\u{f011}", back = "\u{f053}",
   shortcuts = "\u{f11c}", window = "\u{f2d0}", tmux = "\u{ebc8}", vim = "\u{e62b}",
   search = "\u{f002}", folder = "\u{f07b}",
+  toggle = "\u{f205}", insert = "\u{f040}", web = "\u{f0ac}",
+  clipboard = "\u{f0ea}", record = "\u{f111}", emoji = "\u{f118}", palette = "\u{f1fc}",
 }
 
 -- built fresh each time it's opened, so new files show up
@@ -146,11 +156,17 @@ local CAPTURE = { title = "Capture", g = NF.capture, items = {
   { name = "Selection → file",      action = screencap({ "-i" }, true) },
   { name = "Window → file",         action = screencap({ "-iW" }, true) },
   { name = "Whole screen → file",   action = screencap({ "-x" }, true) },
-  { name = "Screen recording…",     g = NF.video, action = deferred(keys({ "cmd", "shift" }, "5")) },
+  { name = "Start / stop recording", g = NF.record,
+    action = function() require("services").toggleRecording() end },
+  { name = "Recording toolbar (⌘⇧5)", g = NF.video, action = deferred(keys({ "cmd", "shift" }, "5")) },
   { name = "Digital Color Meter",   g = NF.eyedropper, action = focus("Digital Color Meter") },
 } }
 
+local function themeMenu() return { title = "Theme", items = theme.list() } end
+
 local STYLE = { title = "Style", g = NF.style, items = {
+  { name = "Theme",      g = NF.palette, menu = themeMenu },
+  { name = "Next theme", g = NF.palette, action = function() theme.cycle(1) end },
   { name = "Dark mode",  g = NF.moon, action = setAppearance(true) },
   { name = "Light mode", g = NF.sun,  action = setAppearance(false) },
   { name = "Wallpaper",  g = NF.image, menu = wallpaperMenu },
@@ -159,9 +175,14 @@ local STYLE = { title = "Style", g = NF.style, items = {
 } }
 
 local SETUP = { title = "Setup", g = NF.setup, items = {
+  { name = "Audio output",       g = NF.sound, menu = pickers.audioMenu("output") },
+  { name = "Audio input",        g = NF.sound, menu = pickers.audioMenu("input") },
+  { name = "Bluetooth devices",  g = NF.bt,   menu = pickers.bluetoothMenu() },
+  { name = "Wi-Fi networks",     g = NF.wifi, menu = pickers.wifiMenu() },
+  { name = "Toggle Wi-Fi",       g = NF.wifi, action = toggleWifi },
+  { header = "SETTINGS PANES" },
   { name = "Wi-Fi settings",     g = NF.wifi,
     action = openURL("x-apple.systempreferences:com.apple.wifi-settings-extension") },
-  { name = "Toggle Wi-Fi",       g = NF.wifi, action = toggleWifi },
   { name = "Bluetooth settings", g = NF.bt,
     action = openURL("x-apple.systempreferences:com.apple.BluetoothSettings") },
   { name = "Sound settings",     g = NF.sound,
@@ -172,15 +193,33 @@ local SETUP = { title = "Setup", g = NF.setup, items = {
     action = openURL("x-apple.systempreferences:com.apple.Keyboard-Settings.extension") },
 } }
 
+local INSERT = { title = "Insert", g = NF.insert, items = {
+  { name = "Emoji",  g = NF.emoji,   menu = emoji.menu },
+  { name = "Glyphs", g = NF.palette, menu = emoji.glyphMenu },
+} }
+
+local INSTALL = { title = "Install", g = NF.web, items = {
+  { name = "Web Apps", g = NF.web, menu = webapp.menu },
+} }
+
+local function clipboardMenu() return { title = "Clipboard", items = clipboard.rows() } end
+
 local SYSTEM = { title = "System", g = NF.system, items = {
+  { header = "POWER" },
   { name = "Lock screen",        g = NF.lock,    action = function() hs.caffeinate.lockScreen() end },
   { name = "Sleep",              g = NF.moon,    action = function() hs.caffeinate.systemSleep() end },
   { name = "Log out…",           g = NF.logout,  action = osa('tell application "System Events" to log out') },
   { name = "Restart…",           g = NF.refresh, action = osa('tell application "System Events" to restart') },
   { name = "Shut down…",         g = NF.power,   action = osa('tell application "System Events" to shut down') },
+  { header = "RELOAD" },
   { name = "Reload Hammerspoon", g = NF.refresh, action = function() hs.reload() end },
   { name = "Reload AeroSpace",   g = NF.refresh, action = shell("aerospace reload-config") },
   { name = "Reload SketchyBar",  g = NF.refresh, action = shell("sketchybar --reload") },
+  { header = "PACKAGES" },
+  { name = "Check for updates",  g = NF.refresh,
+    action = function() require("services").checkUpdates(); hs.alert.show("Checking for updates…") end },
+  { name = "Upgrade packages (brew)", g = NF.refresh,
+    action = function() require("services").runUpgrade() end },
 } }
 
 -- System Settings panes, for root search. `open`ing a stale pane id just lands
@@ -421,9 +460,13 @@ local ROOT = { title = "Go", items = {
   section("LAUNCH"),
   { name = "Apps",      g = NF.apps,      menu = APPS },
   { name = "Terminal",  g = NF.terminal,  menu = TERMINAL },
+  { name = "Install",   g = NF.web,       menu = INSTALL },
   section("DESKTOP"),
   { name = "Capture",   g = NF.capture,   menu = CAPTURE },
   { name = "Style",     g = NF.style,     menu = STYLE },
+  { name = "Toggle",    g = NF.toggle,    menu = toggles.menu },
+  { name = "Clipboard", g = NF.clipboard, menu = clipboardMenu },
+  { name = "Insert",    g = NF.insert,    menu = INSERT },
   { name = "Setup",     g = NF.setup,     menu = SETUP },
   section("SYSTEM"),
   { name = "Shortcuts", g = NF.shortcuts, menu = SHORTCUTS },
@@ -442,13 +485,25 @@ local C = {
 -- ── geometry (Omarchy: --width 295, 2px border, 20px padding, no radius) ────
 local WIDTH    = 300
 local BORDER_W = 2
-local RADIUS   = 0
+local RADIUS   = 10
 local HEADER_H = 42
 local ROW_H    = 38
 local PAD      = 16
 local GLYPH_W  = 22
-local MAX_ROWS = 10
+local MAX_ROWS = 10          -- floor; the real cap is screen-relative (bodyBudget)
 local FONT     = "Hack Nerd Font Mono"
+local TOP_FRAC = 0.16        -- panel top as a fraction of screen height
+local BOT_FRAC = 0.94        -- keep the panel bottom above this fraction
+
+-- Vertical space the row list may use: everything between the panel top and
+-- BOT_FRAC of screen height, but never less than the old 10-row budget. The
+-- root menu then fits without scrolling on any display, while long submenus
+-- (Tiling, search results) still scroll.
+local function bodyBudget()
+  local h = hs.screen.mainScreen():frame().h
+  return math.max(MAX_ROWS * ROW_H,
+    math.floor(h * BOT_FRAC) - math.floor(h * TOP_FRAC) - HEADER_H - PAD)
+end
 
 -- ── icons for the app / file rows (Omarchy's launcher uses real icons) ─────
 local iconCache = {}
@@ -556,7 +611,7 @@ local function clampSel()
   if sel <= scroll then scroll = sel - 1 end
   if scroll < 0 then scroll = 0 end
   -- advance scroll until the selected row fits in the height budget
-  local budget = MAX_ROWS * ROW_H
+  local budget = bodyBudget()
   while scroll < sel - 1 do
     local y = 0
     for ri = scroll + 1, sel do y = y + rowHeight(rows[ri]) end
@@ -671,7 +726,7 @@ end
 local function draw()
   local W = curWidth()
   -- visible slice from `scroll`, capped by a pixel budget (rows vary in height)
-  local budget = MAX_ROWS * ROW_H
+  local budget = bodyBudget()
   local vis, vy = {}, 0
   for ri = scroll + 1, #rows do
     local rh = rowHeight(rows[ri])
@@ -684,17 +739,19 @@ local function draw()
   local scr = hs.screen.mainScreen():frame()
   canvas:frame({
     x = scr.x + math.floor((scr.w - W) / 2),
-    y = scr.y + math.floor(scr.h * 0.20),
+    y = scr.y + math.floor(scr.h * TOP_FRAC),
     w = W, h = h,
   })
 
   local els = {}
   local function add(e) els[#els + 1] = e end
 
-  -- sharp panel + 2px border
-  add({ type = "rectangle", action = "fill", fillColor = { hex = C.base, alpha = 0.96 } })
+  -- rounded panel + 2px border
+  local rr = { xRadius = RADIUS, yRadius = RADIUS }
+  add({ type = "rectangle", action = "fill", fillColor = { hex = C.base, alpha = 0.96 },
+        roundedRectRadii = rr })
   add({ type = "rectangle", action = "stroke", strokeColor = { hex = C.accent },
-        strokeWidth = BORDER_W,
+        strokeWidth = BORDER_W, roundedRectRadii = rr,
         frame = { x = BORDER_W / 2, y = BORDER_W / 2, w = W - BORDER_W, h = h - BORDER_W } })
 
   -- prompt line: "<menu>…" until you type, then the query

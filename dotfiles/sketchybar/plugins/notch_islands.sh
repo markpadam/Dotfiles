@@ -10,6 +10,10 @@
 
 sleep 0.3   # let macOS settle the display arrangement after a dock/undock
 
+# theme colours (Hammerspoon theme switcher writes theme.sh); fall back to Mocha
+[ -r "$CONFIG_DIR/theme.sh" ] && . "$CONFIG_DIR/theme.sh"
+BAR_EXTERNAL=${BAR_EXTERNAL:-0xcc1e1e2e}
+
 top_inset=$(osascript -l JavaScript -e \
     'ObjC.import("AppKit"); $.NSScreen.screens.objectAtIndex(0).safeAreaInsets.top' \
     2>/dev/null)
@@ -21,13 +25,14 @@ case "$top_inset" in
 esac
 
 if [ "$notched" = 1 ]; then
-    # Built-in: dissolve the bar's own background, raise the two island pills
-    sketchybar --bar   color=0x00000000 border_width=0 \
-               --set   left_island  background.drawing=on \
-               --set   right_island background.drawing=on
+    # Built-in: dissolve the bar's own background, raise the two island pills,
+    # and run a touch taller — the notched menu bar is deeper than an external's.
+    sketchybar --bar   color=0x00000000 border_width=0 height=28 \
+               --set   left_island  background.drawing=on  background.height=28 \
+               --set   right_island background.drawing=on  background.height=28
 else
-    # External display: a single continuous bar
-    sketchybar --bar   color=0xcc1e1e2e border_width=1 \
-               --set   left_island  background.drawing=off \
-               --set   right_island background.drawing=off
+    # External display: a single continuous bar at the stock menu-bar height
+    sketchybar --bar   color="$BAR_EXTERNAL" border_width=1 height=24 \
+               --set   left_island  background.drawing=off background.height=24 \
+               --set   right_island background.drawing=off background.height=24
 fi

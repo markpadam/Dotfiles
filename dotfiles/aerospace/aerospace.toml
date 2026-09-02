@@ -1,9 +1,11 @@
 config-version = 2
 
-# Keybindings below are the stock AeroSpace defaults, verbatim from
-# /Applications/AeroSpace.app/Contents/Resources/default-config.toml.
-# Modifier is the physical Option (alt) key — no Karabiner remap involved.
-# Everything above the [mode.*] tables is local customisation.
+# Keybindings in the [mode.*] tables follow the Omachy guide
+# (https://omachy.org/guide.html) — AeroSpace's stock defaults plus alt-f
+# fullscreen, alt-shift-space float/tile, alt-q close, alt-r resize mode,
+# alt-enter new terminal, the cmd-h disables and a resize mode; the workspace
+# block is Mark's (five named, not numbered 1-9). Modifier is the physical
+# Option (alt) key — no Karabiner remap. Everything above [mode.*] is local.
 
 # ── Startup ──────────────────────────────────────────────────────────────────
 # Border colours/width live in ~/.config/borders/bordersrc, not here — the
@@ -45,9 +47,9 @@ accordion-padding = 30
 default-root-container-layout = 'tiles'
 default-root-container-orientation = 'auto'
 
-# Six named workspaces, kept alive even when empty so the keys and the
-# SketchyBar pills always land somewhere. Bound to alt-1..alt-6 below.
-persistent-workspaces = ['desktop', 'terminal', 'browser', 'comms', 'man', 'aks-lab']
+# Five named workspaces, kept alive even when empty so the keys and the
+# SketchyBar pills always land somewhere. Bound to alt-1..alt-5 below.
+persistent-workspaces = ['desktop', 'terminal', 'browser', 'comms', 'aks-lab']
 
 # ── Tree normalizations ───────────────────────────────────────────────────────
 enable-normalization-flatten-containers = true
@@ -114,6 +116,10 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.apple.finder'
     run = 'layout floating'
 
+[[on-window-detected]]  # Home
+    if.app-id = 'com.apple.Home'
+    run = 'layout floating'
+
 [[on-window-detected]]  # Messages
     if.app-id = 'com.apple.MobileSMS'
     run = 'layout floating'
@@ -159,19 +165,22 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     # `make new document` window is the loading URL ("localhost:9997") before
     # the page renders its own <title>. If the dashboard's title turns out to
     # be something stable, tighten this to that; if a window slips through to
-    # `browser`, alt-shift-6 moves it.
+    # `browser`, alt-shift-5 moves it.
     if.app-id = 'com.apple.Safari'
     if.window-title-regex-substring = '(?i)localhost:9997'
     run = 'move-node-to-workspace aks-lab'
 
-[[on-window-detected]]  # Safari — docs/manuals to `man`
-    if.app-id = 'com.apple.Safari'
-    if.window-title-regex-substring = '(?i)guide|docs|documentation|manual|reference|readme|handbook'
-    run = 'move-node-to-workspace man'
-
 [[on-window-detected]]  # Safari — everything else to `browser`
     if.app-id = 'com.apple.Safari'
     run = 'move-node-to-workspace browser'
+
+[[on-window-detected]]  # Ghostty — the Hammerspoon scratchpad (Ctrl+`).
+    # Float it and DON'T route it to a workspace, so the drop-down terminal
+    # follows you (Hammerspoon owns its geometry + show/hide — scratchpad.lua).
+    # Must precede the two Ghostty rules below (first match wins).
+    if.app-id = 'com.mitchellh.ghostty'
+    if.window-title-regex-substring = '(?i)scratchpad'
+    run = 'layout floating'
 
 [[on-window-detected]]  # Ghostty — the AKS-Lab cockpit only. Its `--title` is
     # locked to "AKS Lab"; this rule (app-id AND title, both must match) sends
@@ -194,13 +203,17 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 
 [[on-window-detected]]  # Vial (keyboard config)
     if.app-id = 'today.vial'
-    run = 'move-node-to-workspace man'
+    run = 'move-node-to-workspace desktop'
 
-# ── Main keybindings (AeroSpace defaults) ────────────────────────────────────
+# ── Main keybindings (Omachy guide — https://omachy.org/guide.html) ──────────
+# Follows the Omachy AeroSpace bindings, EXCEPT the workspaces below are named &
+# positional (Mark's customisation) instead of Omachy's numbered 1-9.
 [mode.main.binding]
     # Layout
-    alt-slash = 'layout tiles horizontal vertical'
-    alt-comma = 'layout accordion horizontal vertical'
+    alt-slash       = 'layout tiles horizontal vertical'
+    alt-comma       = 'layout accordion horizontal vertical'
+    alt-shift-space = 'layout floating tiling'      # toggle floating / tiling
+    alt-f           = 'macos-native-fullscreen'     # fullscreen the focused window
 
     # Focus
     alt-h = 'focus left'
@@ -217,32 +230,39 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     # Resize
     alt-minus = 'resize smart -50'
     alt-equal = 'resize smart +50'
+    alt-r     = 'mode resize'          # enter resize mode (h/j/k/l to size)
 
-    # Workspaces — six named, positional. See persistent-workspaces above and
-    # the SketchyBar pills (dotfiles/sketchybar/sketchybarrc). 7-9 / A-Z dropped.
+    # Workspaces — five named, positional. See persistent-workspaces above and
+    # the SketchyBar pills (dotfiles/sketchybar/sketchybarrc). 6-9 / A-Z dropped.
     alt-1 = 'workspace desktop'
     alt-2 = 'workspace terminal'
     alt-3 = 'workspace browser'
     alt-4 = 'workspace comms'
-    alt-5 = 'workspace man'
-    alt-6 = 'workspace aks-lab'
+    alt-5 = 'workspace aks-lab'
 
     # Move focused window to workspace (same positional keys + shift)
     alt-shift-1 = 'move-node-to-workspace desktop'
     alt-shift-2 = 'move-node-to-workspace terminal'
     alt-shift-3 = 'move-node-to-workspace browser'
     alt-shift-4 = 'move-node-to-workspace comms'
-    alt-shift-5 = 'move-node-to-workspace man'
-    alt-shift-6 = 'move-node-to-workspace aks-lab'
+    alt-shift-5 = 'move-node-to-workspace aks-lab'
 
     # Workspace navigation
     alt-tab = 'workspace-back-and-forth'
     alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
-    # Service mode
+    # Window
+    alt-q     = 'close'
+    alt-enter = 'exec-and-forget osascript -e "tell application \"Ghostty\" to new window"'
+
+    # Stop the macOS hide shortcuts from making a tiled window vanish
+    cmd-h     = []
+    cmd-alt-h = []
+
+    # Modes
     alt-shift-semicolon = 'mode service'
 
-# ── Service mode (AeroSpace defaults) ────────────────────────────────────────
+# ── Service mode (Omachy guide) ─────────────────────────────────────────────
 [mode.service.binding]
     esc = ['reload-config', 'mode main']
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
@@ -253,3 +273,14 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     alt-shift-j = ['join-with down', 'mode main']
     alt-shift-k = ['join-with up', 'mode main']
     alt-shift-l = ['join-with right', 'mode main']
+
+# ── Resize mode (Omachy guide) ─────────────────────────────────────────────
+[mode.resize.binding]
+    h     = 'resize width -50'
+    j     = 'resize height +50'
+    k     = 'resize height -50'
+    l     = 'resize width +50'
+    minus = 'resize smart -50'
+    equal = 'resize smart +50'
+    enter = 'mode main'
+    esc   = 'mode main'
