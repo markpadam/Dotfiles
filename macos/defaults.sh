@@ -77,10 +77,11 @@ hotkey 127 true 48 29 262144   # Desktop 10
 # input source installed it would be a no-op either way.
 hotkey 61 false 32 49 786432
 
-# Cmd+Space, Spotlight. Enabled — and now uncontested: Raycast owned this chord
-# until it was removed on 5 August 2026. Note Opt+Cmd+Space (id 65, Finder
-# search window) is deliberately left alone.
+# Cmd+Space (id 64) → Spotlight, and Opt+Cmd+Space (id 65) → Finder search
+# window. Both explicitly enabled. The Omachy command menu lives on Opt+Space
+# (Hammerspoon, dotfiles/hammerspoon/menu.lua), so nothing contends for these.
 hotkey 64 true 32 49 1048576
+hotkey 65 true 32 49 1572864
 
 # --- Apply ------------------------------------------------------------------
 # Dock and Finder only re-read their prefs on restart. AppleInterfaceStyle needs

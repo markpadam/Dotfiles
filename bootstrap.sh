@@ -115,20 +115,6 @@ for src in "$DOTFILES/config"/*; do
     link "$src" "$HOME/.config/$(basename "$src")"
 done
 
-# --- Raycast script commands ------------------------------------------------
-# Surfaced under ~/Documents rather than added straight from the repo. Raycast
-# tracks read permission per folder and holds one for Documents out of the box;
-# pointing it at ~/.dotfiles produced no commands at all, even though its own
-# folder bookmark resolved to the correct path. Documents is also not hidden,
-# so it shows up in the picker without toggling hidden files.
-#
-# Raycast follows the symlink, so the repo stays the single source of truth and
-# nothing is duplicated. Adding the directory is still a manual step in
-# Raycast's settings -- its config lives in an encrypted database with no CLI.
-if [ "$MACOS" -eq 1 ] && [ -d "$DOTFILES/raycast/scripts" ]; then
-    link "$DOTFILES/raycast/scripts" "$HOME/Documents/Raycast Scripts"
-fi
-
 # --- snapshot-only configs --------------------------------------------------
 # These apps rewrite their own config at runtime, so they are copied rather than
 # symlinked — a symlink would let the app commit its runtime state (and, for gh,

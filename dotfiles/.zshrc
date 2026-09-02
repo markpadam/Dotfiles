@@ -63,7 +63,14 @@ HISTFILE="$HOME/.zsh_history"
 eval "$(starship init zsh)"
 eval "$(fzf --zsh)"
 eval "$(atuin init zsh)"
+eval "$(zoxide init zsh --cmd cd)"
 set -o vi
+# modern CLI replacements: eza→ls, bat→cat, zoxide→cd (above)
+alias ls='eza --group-directories-first --icons=auto'
+alias ll='eza -la --git --group-directories-first --icons=auto'
+alias la='eza -a --group-directories-first --icons=auto'
+alias lt='eza --tree --level=2 --group-directories-first --icons=auto'
+alias cat='bat --paging=never'
 fastfetch
 dev() { sh ~/.config/omachy/dev-session.sh "$@"; }
 # ── End Omachy managed ──

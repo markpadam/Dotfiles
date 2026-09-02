@@ -50,10 +50,10 @@ next login. `defaults.sh` calls it at the end of the section:
   the primary way to switch. (SketchyBar's current workspace pills call
   `aerospace workspace <name>` directly, not these — a change from the old
   bar, which synthesised Ctrl+N on click before it was removed on 2026-08-04.)
-- **Cmd+Space (id 64) is enabled — Spotlight, and now uncontested.** Raycast used
-  to own this chord and id 64 was disabled for it; that was reversed on 2026-08-03,
-  and Raycast itself was removed on 2026-08-05. The old caveat about clearing
-  Raycast's own global hotkey in its settings no longer applies.
+- **Cmd+Space (id 64) and Opt+Cmd+Space (id 65) are both explicitly enabled** —
+  Spotlight, and the Finder search window. The Omachy command menu is on
+  Opt+Space (Hammerspoon, `dotfiles/hammerspoon/menu.lua`), which nothing else
+  claims, so these two are left to macOS.
 - **Ctrl+Opt+Space (id 61) is disabled.** It was unbound because it collided with
   skhd's float toggle. skhd went on 2026-08-03 and yabai on 2026-08-05, so nothing
   claims the chord now — but 61 is still deliberately left disabled, because
