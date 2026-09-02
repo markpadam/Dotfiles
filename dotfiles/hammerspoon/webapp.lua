@@ -1,9 +1,12 @@
 -- webapp.lua — websites as quick-launch entries in Opt+Space -> Web Apps.
 --
--- Opens frameless via Brave's `--app=<url>` (no tab strip, no toolbar). It runs
--- in Brave's DEFAULT profile — deliberately, no `--user-data-dir` — so your
--- Brave logins, autofill and built-in password manager all work. Falls back to
--- `open <url>` in the default browser if Brave isn't installed.
+-- Launch order for an entry:
+--   1. a Safari "Add to Dock" web app that matches (frameless, and it uses
+--      iCloud Keychain autofill) — you create these once via Safari ▸ File ▸
+--      Add to Dock; they live in ~/Applications as com.apple.Safari.WebApp.* bundles
+--   2. Brave `--app=<url>` in Brave's DEFAULT profile (frameless, Brave's own
+--      password manager / logins)
+--   3. the default browser
 --
 -- Registry: ~/.local/share/omachy/webapps.json   (not tracked)
 -- Favicons: ~/.local/share/omachy/webapp-icons/<slug>.png
@@ -34,11 +37,52 @@ local function save(list)
 end
 
 local function slugify(s) return (s:lower():gsub("[^%w]+", "-"):gsub("^-+", ""):gsub("-+$", "")) end
-local function domain(url) return (url:match("^https?://([^/]+)") or url) end
+local function domain(url) return ((url or ""):match("^https?://([^/]+)") or (url or "")):gsub("^www%.", "") end
+
+-- ── Safari "Add to Dock" web apps ─────────────────────────────────────────
+local safariCache, safariAt
+function M.safariApps()
+  local now = hs.timer.secondsSinceEpoch()
+  if safariCache and now - safariAt < 30 then return safariCache end
+  local out = {}
+  local dir = HOME .. "/Applications"
+  local ok, iter, d = pcall(hs.fs.dir, dir)
+  if ok then
+    for f in iter, d do
+      if f:sub(-4) == ".app" then
+        local pl = select(2, pcall(hs.plist.read, dir .. "/" .. f .. "/Contents/Info.plist"))
+        local bid = type(pl) == "table" and pl.CFBundleIdentifier
+        if type(bid) == "string" and bid:find("com.apple.Safari.WebApp", 1, true) == 1 then
+          out[#out + 1] = {
+            name = pl.CFBundleName or f:sub(1, -5),
+            url  = pl.Manifest and pl.Manifest.start_url,
+            path = dir .. "/" .. f,
+          }
+        end
+      end
+    end
+  end
+  safariCache, safariAt = out, now
+  return out
+end
+
+-- strip a "(5) " unread count and a " | Site" / " - Site" tail
+local function cleanName(s)
+  s = (s or ""):gsub("^%s*%(%d+%)%s*", ""):gsub("%s*[|%-–—][^|%-–—]*$", "")
+  return (s:gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
+local function safariAppFor(entry)
+  local en, ed = entry.name:lower(), domain(entry.url)
+  for _, s in ipairs(M.safariApps()) do
+    local sn = cleanName(s.name):lower()
+    if en == sn or en:find(sn, 1, true) or sn:find(en, 1, true) or ed == domain(s.url) then
+      return s
+    end
+  end
+end
 
 -- ── favicons ──────────────────────────────────────────────────────────────
--- prefer the dashboard's curated icon (homarr dashboard-icons), else the site's
--- favicon via Google's service.
 local function iconUrl(url, hp)
   if type(hp) == "string" and hp ~= "" then
     if hp:match("^https?://") then return hp end
@@ -68,6 +112,8 @@ end
 
 -- ── launch / add / remove ─────────────────────────────────────────────────
 function M.launch(app)
+  local s = safariAppFor(app)
+  if s then hs.task.new("/usr/bin/open", nil, { s.path }):start(); return end
   if hs.application.pathForBundleID("com.brave.Browser") then
     hs.task.new("/usr/bin/open", nil,
       { "-na", "Brave Browser", "--args", "--app=" .. app.url }):start()
@@ -91,6 +137,19 @@ function M.add()
   hs.alert.show("\u{f0ac}  Added " .. name)
 end
 
+-- open a URL in Safari so the user can finish with File ▸ Add to Dock
+function M.newSafariApp()
+  local ok, url = hs.dialog.textPrompt("New Safari web app",
+    "Opens the URL in Safari — then use its\nFile ▸ Add to Dock (name it to match).",
+    "https://", "Open in Safari", "Cancel")
+  if ok ~= "Open in Safari" or not url:match("^https?://") then return end
+  hs.osascript.applescript(
+    ('tell application "Safari"\nactivate\nmake new document with properties {URL:%q}\nend tell'):format(url))
+  hs.timer.doAfter(1.2, function()
+    hs.alert.show("Safari ▸ File ▸ Add to Dock  to finish", 5)
+  end)
+end
+
 function M.remove(slug)
   local out = {}
   for _, a in ipairs(load()) do if a.slug ~= slug then out[#out + 1] = a end end
@@ -98,15 +157,12 @@ function M.remove(slug)
 end
 
 -- ── sync from the home dashboard ──────────────────────────────────────────
--- Read homepage's /api/services (gethomepage.dev) and keep the
--- `source = "homepage"` entries in step with it — add new services, drop ones
--- that have gone. Hand-added entries are never touched.
 function M.syncHomepage(cb)
   hs.task.new("/usr/bin/curl", function(_, body)
     local ok, groups = pcall(hs.json.decode, body or "")
     if not ok or type(groups) ~= "table" then if cb then cb(false, 0) end; return end
 
-    local svc, order = {}, {}         -- url -> { name, icon }
+    local svc, order = {}, {}
     for _, grp in ipairs(groups) do
       for _, s in ipairs(grp.services or {}) do
         local url = s.href
@@ -121,7 +177,7 @@ function M.syncHomepage(cb)
     for _, a in ipairs(list) do
       if a.source ~= "homepage" then kept[#kept + 1] = a
       elseif svc[a.url] then kept[#kept + 1] = a; svc[a.url] = nil
-      else changed = true end                          -- gone from the dashboard
+      else changed = true end
     end
     for _, url in ipairs(order) do
       local s = svc[url]
@@ -141,8 +197,11 @@ end
 local function row(a)
   local img = iconFor(a.slug)
   if not img then fetchIcon(a.slug, a.url) end
-  return { name = a.name, image = img, g = img and nil or "\u{f0ac}",
-           action = function() M.launch(a) end }
+  return {
+    name = a.name .. (safariAppFor(a) and "" or "  ·"),   -- trailing dot = Brave fallback
+    image = img, g = img and nil or "\u{f0ac}",
+    action = function() M.launch(a) end,
+  }
 end
 
 function M.menu()
@@ -155,10 +214,10 @@ function M.menu()
   end
 
   local items = {
-    { name = "Add web app…", g = "\u{f0fe}", action = M.add },
+    { name = "New Safari web app…", g = "\u{f0fe}", action = M.newSafariApp },
+    { name = "Add web app…",        g = "\u{f0fe}", action = M.add },
   }
 
-  -- Home dashboard, its sync action and its synced services in one submenu
   if dash or #homepage > 0 then
     local sub = {}
     if dash then sub[#sub + 1] = row(dash) end
@@ -174,6 +233,19 @@ function M.menu()
 
   if #mine > 0 then items[#items + 1] = { header = "" } end
   for _, a in ipairs(mine) do items[#items + 1] = row(a) end
+
+  -- every Safari web app on disk, so ones made outside the menu are reachable
+  local sa = M.safariApps()
+  if #sa > 0 then
+    local ss = {}
+    for _, s in ipairs(sa) do
+      ss[#ss + 1] = { name = cleanName(s.name),
+        action = function() hs.task.new("/usr/bin/open", nil, { s.path }):start() end }
+    end
+    items[#items + 1] = { header = "" }
+    items[#items + 1] = { name = "Safari Dock apps", g = "\u{f179}",
+      menu = { title = "Safari Dock apps", items = ss } }
+  end
 
   if #list > 0 then
     local rm = {}

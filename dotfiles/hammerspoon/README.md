@@ -45,15 +45,19 @@ switcher.lua    themed Cmd+Tab (menu-style list; needs the Karabiner remap)
 dock.lua        themed left-edge dock — the macOS one can't be re-coloured
 wsflash.lua     centre flash of the workspace name on switch (Hyprland-style)
 pickers.lua     audio / Bluetooth / Wi-Fi / SSH pickers for the menu
-webapp.lua      websites frameless via Brave --app; auto-syncs the home dashboard
+webapp.lua      web apps (Safari Dock app > Brave --app); syncs the home dashboard
 emoji.lua       emoji + Nerd-Font-glyph picker
 ```
 
 `wsflash.lua` reads `~/.cache/omachy/workspace`, which `aerospace.toml`'s
-`exec-on-workspace-change` writes. `webapp.lua` pulls the home dashboard's
-`/api/services` (gethomepage.dev) on start + every 6h and keeps a web-app entry
-per service (`source = "homepage"`, pruned when a service goes); hand-added
-entries via **Web Apps ▸ Add web app…** are left alone. The `SketchyBar`
+`exec-on-workspace-change` writes. `webapp.lua` launches a web app as, in order: a matching **Safari "Add to
+Dock" app** (`~/Applications/*.app`, `com.apple.Safari.WebApp.*` — frameless +
+iCloud Keychain autofill; you make these via Safari ▸ File ▸ Add to Dock, name
+to match), else **Brave `--app=<url>`** in the default profile (a `·` in the
+menu row flags this), else the default browser. It also pulls the home
+dashboard's `/api/services` on start + every 6h and keeps a web-app entry per
+service (`source = "homepage"`, pruned when one goes); hand-added entries are
+left alone. The `SketchyBar`
 `hsq.vpn` glyph shows when a VPN is up (scutil-managed, or a `utun` default
 route with NordVPN running).
 
