@@ -12,6 +12,9 @@ PLUGIN_DIR="$CONFIG_DIR/plugins"
 # mauve:   0xffcba6f7
 
 # ── Bar appearance ────────────────────────────────────────────────────────────
+# Shares the Opt+Space command menu's palette (dotfiles/hammerspoon/menu.lua):
+# Hack Nerd Font Mono, a 2px mauve border (0xffcba6f7), base at ~0.94, mauve as
+# the one accent (the active workspace). Rounded and bold here, by choice.
 sketchybar --bar \
     position=top          \
     height=24             \
@@ -19,9 +22,9 @@ sketchybar --bar \
     y_offset=2            \
     corner_radius=8       \
     blur_radius=20        \
-    color=0xcc1e1e2e      \
-    border_width=1        \
-    border_color=0x44cdd6f4 \
+    color=0xf01e1e2e      \
+    border_width=2        \
+    border_color=0xffcba6f7 \
     shadow=off            \
     topmost=window        \
     padding_left=12       \
@@ -29,75 +32,75 @@ sketchybar --bar \
 
 # ── Global item defaults ──────────────────────────────────────────────────────
 sketchybar --default \
-    padding_left=4                              \
-    padding_right=4                             \
-    icon.font="HackNerdFont-Bold:Bold:13.0"     \
-    label.font="HackNerdFont-Bold:Bold:12.0"    \
-    icon.color=0xffcdd6f4                       \
-    label.color=0xffcdd6f4                      \
-    icon.padding_left=6                         \
-    icon.padding_right=4                        \
-    label.padding_left=4                        \
+    padding_left=4                                 \
+    padding_right=4                                \
+    icon.font="Hack Nerd Font Mono:Regular:13.0"   \
+    label.font="Hack Nerd Font Mono:Bold:12.0"     \
+    icon.color=0xffa6adc8                          \
+    label.color=0xffcdd6f4                         \
+    icon.padding_left=6                            \
+    icon.padding_right=4                           \
+    label.padding_left=4                           \
     label.padding_right=6
 
 # ── LEFT: AeroSpace workspace indicators ──────────────────────────────────────
 sketchybar --add event aerospace_workspace_change
 
-COLOR=0xff89b4fa
+COLOR=0xffcba6f7   # mauve — the active-workspace accent (matches the menu)
 
-# Six named workspaces (see dotfiles/aerospace/aerospace.toml). The Nerd Font
+# Five named workspaces (see dotfiles/aerospace/aerospace.toml). The Nerd Font
 # glyph is the item *icon* and ws_label[i] is the *label*, so icon.padding_right
 # sets the gap between them. The label is the workspace name with its alt-key
 # number in brackets — e.g. `terminal (2)` is on alt-2 — kept decoupled from
 # ws_name (the AeroSpace identifier, used by click_script and aerospace.sh) so
 # the cosmetic suffix never touches AeroSpace. Glyphs are stored as UTF-8 byte
 # escapes so tooling that rewrites this file can't silently strip the
-# private-use codepoints. Material Design Icons range (F0000+) only — the Font
-# Awesome range (F108 etc.) is absent from Hack Nerd Font *Bold*. Glyphs:
-#   F0379 monitor  F018D console  F059F web  F0361 message  F02D2 book  F10FE kubernetes
-ws_name=(desktop            terminal         browser          comms          man          aks-lab)
-ws_label=("desktop (1)"     "terminal (2)"   "browser (3)"    "comms (4)"    "man (5)"    "AKS Lab (6)")
-ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb0\x8b\x92' $'\xf3\xb1\x83\xbe')
+# private-use codepoints. Material Design Icons range (F0000+); Hack Nerd Font
+# Mono *Regular* carries both the MD and Font Awesome ranges. Glyphs:
+#   F0379 monitor  F018D console  F059F web  F0361 message  F10FE kubernetes
+ws_name=(desktop            terminal         browser          comms          aks-lab)
+ws_label=("Desktop (1)"     "Terminal (2)"   "Browser (3)"    "Comms (4)"    "AKS Lab (5)")
+ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb1\x83\xbe')
 for i in "${!ws_name[@]}"; do
     n="${ws_name[$i]}"
     sketchybar --add item space."$n" left \
         --subscribe space."$n" aerospace_workspace_change \
         --set space."$n" \
-            background.color=0x00000000              \
-            background.corner_radius=6               \
-            background.height=18                     \
-            background.drawing=off                   \
-            icon="${ws_icon[$i]}"                    \
-            icon.font="HackNerdFont-Bold:Bold:13.0"  \
-            icon.color=$COLOR                        \
-            icon.padding_left=7                      \
-            icon.padding_right=6                     \
-            label="${ws_label[$i]}"                  \
-            label.font="HackNerdFont-Bold:Bold:11.0" \
-            label.color=$COLOR                       \
-            label.padding_left=0                     \
-            label.padding_right=7                    \
-            padding_left=2                           \
-            padding_right=2                          \
-            click_script="aerospace workspace $n"    \
+            background.color=0x00000000                    \
+            background.corner_radius=6                     \
+            background.height=18                           \
+            background.drawing=off                         \
+            icon="${ws_icon[$i]}"                          \
+            icon.font="Hack Nerd Font Mono:Regular:13.0"   \
+            icon.color=0xffa6adc8                          \
+            icon.padding_left=7                            \
+            icon.padding_right=6                           \
+            label="${ws_label[$i]}"                        \
+            label.font="Hack Nerd Font Mono:Bold:11.0"     \
+            label.color=0xffa6adc8                         \
+            label.padding_left=0                           \
+            label.padding_right=7                          \
+            padding_left=2                                 \
+            padding_right=2                                \
+            click_script="aerospace workspace $n"          \
             script="$PLUGIN_DIR/aerospace.sh $n $COLOR"
 done
 
 # Group workspace items under a shared background pill
 sketchybar --add bracket workspaces '/space\..*/' \
     --set workspaces \
-        background.color=0x33313244     \
+        background.color=0x1acba6f7     \
         background.corner_radius=8      \
         background.height=20            \
         background.border_width=1       \
-        background.border_color=0x33cdd6f4
+        background.border_color=0x40cba6f7
 
 # ── LEFT: Frontmost app name ──────────────────────────────────────────────────
 sketchybar --add item front_app left \
     --set front_app \
         icon.drawing=off                                    \
-        label.font="HackNerdFont-Bold:Bold:12.0"            \
-        label.color=0xffa6adc8                              \
+        label.font="Hack Nerd Font Mono:Bold:12.0"          \
+        label.color=0xffcdd6f4                              \
         padding_left=10                                     \
         script="$PLUGIN_DIR/front_app.sh"                   \
     --subscribe front_app front_app_switched
@@ -106,7 +109,7 @@ sketchybar --add item front_app left \
 sketchybar --add item clock right \
     --set clock \
         icon=""                     \
-        icon.color=0xff89b4fa       \
+        icon.color=0xffa6adc8       \
         icon.padding_left=0         \
         label.color=0xffcdd6f4      \
         padding_left=4              \
@@ -133,8 +136,8 @@ sketchybar --add item volume right \
 sketchybar --add item cpu right \
     --set cpu \
         icon="󰻠"                   \
-        icon.font="HackNerdFont-Bold:Bold:13.0" \
-        icon.color=0xffa6e3a1       \
+        icon.font="Hack Nerd Font Mono:Regular:13.0" \
+        icon.color=0xffa6adc8       \
         label.color=0xffcdd6f4      \
         update_freq=10              \
         script="$PLUGIN_DIR/cpu.sh"
@@ -152,20 +155,20 @@ sketchybar --add item memory right \
 # stay hidden and the bar's own background is the single continuous bar.
 sketchybar --add bracket left_island '/space\..*/' front_app \
     --set left_island \
-        background.color=0xcc1e1e2e     \
+        background.color=0xf01e1e2e     \
         background.corner_radius=8      \
         background.height=24            \
-        background.border_width=1       \
-        background.border_color=0x44cdd6f4 \
+        background.border_width=2       \
+        background.border_color=0xffcba6f7 \
         background.drawing=off
 
 sketchybar --add bracket right_island clock battery volume cpu memory \
     --set right_island \
-        background.color=0xcc1e1e2e     \
+        background.color=0xf01e1e2e     \
         background.corner_radius=8      \
         background.height=24            \
-        background.border_width=1       \
-        background.border_color=0x44cdd6f4 \
+        background.border_width=2       \
+        background.border_color=0xffcba6f7 \
         background.drawing=off
 
 # Invisible worker: re-evaluates which layout to show on every display change.

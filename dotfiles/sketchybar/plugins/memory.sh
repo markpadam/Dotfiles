@@ -23,11 +23,11 @@ USED_GB=$(( USED_BYTES / 1073741824 ))
 PCT=$(( USED_BYTES * 100 / TOTAL ))
 
 if [ "$PCT" -ge 80 ]; then
-    COLOR=0xfff38ba8   # red
+    COLOR=0xfff38ba8   # red — pressure
 elif [ "$PCT" -ge 60 ]; then
-    COLOR=0xfff9e2af   # yellow
+    COLOR=0xfff9e2af   # yellow — filling
 else
-    COLOR=0xffa6e3a1   # green
+    COLOR=0xffa6adc8   # subtext — normal (matches the menu)
 fi
 
 sketchybar --set "$NAME" icon="󰍛" icon.color="$COLOR" label="${USED_GB}/${TOTAL_GB}GB"

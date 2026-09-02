@@ -12,7 +12,7 @@ brew install felixkratz/formulae/sketchybar
 brew install --cask font-sketchybar-app-font   # glyph font
 ```
 
-The bar also uses **Hack Nerd Font** for its own icons and labels — installed
+The bar uses **Hack Nerd Font Mono** for its own icons and labels — installed
 via the `Brewfile` cask list.
 
 ## Config
@@ -31,22 +31,30 @@ run it.
 
 ### Layout
 
-`sketchybarrc` is Catppuccin Mocha, Hack Nerd Font, 24pt tall (the macOS
-menu-bar height), rounded and blurred.
+`sketchybarrc` shares the **Opt+Space command menu**'s palette
+(`dotfiles/hammerspoon/menu.lua`): Catppuccin Mocha, **Hack Nerd Font Mono**,
+24pt tall (the macOS menu-bar height), a **2px mauve (`0xffcba6f7`) border**,
+blurred, and mauve as the one accent — everything else is `text` / `subtext`
+grey. Warning colours (yellow/red) survive only on the CPU / memory / battery
+meters; idle/normal there is `subtext`. Rounded corners (bar 8, pills 6),
+**bold labels**, and workspace names capitalised (`Desktop (1)` …) are the
+bar's own choices, not the menu's.
 
 ```
-LEFT    workspace pills (desktop terminal browser comms man aks-lab)  ->  front_app
+LEFT    workspace pills (desktop terminal browser comms aks-lab)  ->  front_app
 RIGHT   clock  battery  volume  cpu  memory
 ```
 
 One pill per AeroSpace workspace, `icon + label` (Nerd Font glyph from the
-Material Design range — the Font Awesome range is missing from Hack Nerd Font
-Bold, which the labels render in; glyphs are stored as `$'\xNN'` byte escapes
-so a file rewrite can't strip the private-use codepoints). The label
-(`ws_label`) is the workspace name plus its `alt`-key number in brackets —
-`desktop (1)` … `AKS Lab (6)` — kept separate from `ws_name`, the AeroSpace
-identifier used by `click_script` and `aerospace.sh`. Pills subscribe to the
-`aerospace_workspace_change` event and colour the focused one; each pill's
+Material Design range; Hack Nerd Font Mono *Regular* carries both the MD and
+Font Awesome ranges. Glyphs are stored as `$'\xNN'` byte escapes so a file
+rewrite can't strip the private-use codepoints). The label (`ws_label`) is the
+workspace name plus its `alt`-key number in brackets — `desktop (1)` … `AKS
+Lab (5)` — kept separate from `ws_name`, the AeroSpace identifier used by
+`click_script` and `aerospace.sh`. Pills subscribe to the
+`aerospace_workspace_change` event; the focused pill takes the menu's
+selected-row look (a faint mauve-tinted fill + mauve icon/label), the rest are
+`subtext` grey. Each pill's
 `click_script` is `aerospace workspace <name>`, so a click switches workspace
 through the AeroSpace CLI
 directly — **no osascript, no Automation grant.** `plugins/aerospace.sh` takes

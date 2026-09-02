@@ -9,18 +9,17 @@ if [ -z "$PERCENTAGE" ]; then
 fi
 
 if [ -n "$CHARGING" ]; then
-    ICON="󰂄"                    # charging
-    COLOR=0xffa6e3a1            # green
+    ICON="󰂄" COLOR=0xffcba6f7   # charging — mauve accent
 elif [ "$PERCENTAGE" -ge 80 ]; then
-    ICON="󰁹" COLOR=0xffcdd6f4   # full
+    ICON="󰁹" COLOR=0xffa6adc8   # full
 elif [ "$PERCENTAGE" -ge 60 ]; then
-    ICON="󰂁" COLOR=0xffcdd6f4
+    ICON="󰂁" COLOR=0xffa6adc8
 elif [ "$PERCENTAGE" -ge 40 ]; then
-    ICON="󰁾" COLOR=0xfff9e2af   # yellow
+    ICON="󰁾" COLOR=0xffa6adc8
 elif [ "$PERCENTAGE" -ge 20 ]; then
-    ICON="󰁼" COLOR=0xfff38ba8   # red-ish
+    ICON="󰁼" COLOR=0xfff9e2af   # yellow — getting low
 else
-    ICON="󰁺" COLOR=0xfff38ba8   # critical
+    ICON="󰁺" COLOR=0xfff38ba8   # red — critical
 fi
 
 sketchybar --set "$NAME" icon="$ICON" icon.color="$COLOR" label="${PERCENTAGE}%"
