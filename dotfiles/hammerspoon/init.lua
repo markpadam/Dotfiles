@@ -44,3 +44,7 @@ end
 screenWatcher = hs.screen.watcher.new(updateMenuBarAutohide)
 screenWatcher:start()
 updateMenuBarAutohide()
+
+-- Omachy-style command menu (Apps / Capture / Style / Setup / System) on the
+-- Raycast slot, Option+Space. Tree lives in menu.lua alongside this file.
+require("menu").bind({ "alt" }, "space")
