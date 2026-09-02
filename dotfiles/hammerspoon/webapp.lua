@@ -155,17 +155,18 @@ function M.menu()
   end
 
   local items = {
-    { name = "Add web app…",        g = "\u{f0fe}", action = M.add },
-    { name = "Sync home dashboard",  g = "\u{f021}", action = function()
-      M.syncHomepage(function(ch, n) hs.alert.show(("Home dashboard: %d services%s")
-        :format(n, ch and ", updated" or "")) end)
-    end },
+    { name = "Add web app…", g = "\u{f0fe}", action = M.add },
   }
 
-  -- Home dashboard + its synced services, tucked in one submenu
+  -- Home dashboard, its sync action and its synced services in one submenu
   if dash or #homepage > 0 then
     local sub = {}
-    if dash then sub[#sub + 1] = row(dash); sub[#sub + 1] = { header = "SERVICES" } end
+    if dash then sub[#sub + 1] = row(dash) end
+    sub[#sub + 1] = { name = "Sync now", g = "\u{f021}", action = function()
+      M.syncHomepage(function(ch, n) hs.alert.show(("Home dashboard: %d services%s")
+        :format(n, ch and ", updated" or "")) end)
+    end }
+    if #homepage > 0 then sub[#sub + 1] = { header = "SERVICES" } end
     for _, a in ipairs(homepage) do sub[#sub + 1] = row(a) end
     items[#items + 1] = { name = "Home Dashboard", image = dash and iconFor(dash.slug) or nil,
       g = "\u{f0ac}", menu = { title = "Home Dashboard", items = sub } }
