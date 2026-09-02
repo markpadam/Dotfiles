@@ -64,7 +64,7 @@ gotchas; these bullets are just the map.
 
 - **AeroSpace** (`dotfiles/aerospace/`) — tiling window manager on its stock
   `alt`-prefixed bindings. Five named workspaces on `alt-1`..`alt-5` —
-  `desktop` / `terminal` / `browser` / `comms` / `aks-lab` — shown as
+  `desktop` / `terminal` / `browser` / `comms` / `coding` — shown as
   SketchyBar pills; a list of always-floating apps; `alt--` / `alt-=` resize
   (no mouse-drag resize, by design). On login the workspace apps are
   relaunched (`after-startup-command`) and `on-window-detected` rules route

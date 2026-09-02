@@ -24,19 +24,6 @@ after-startup-command = [
     'exec-and-forget open -a Mail',
     'exec-and-forget open -a WhatsApp',
     'exec-and-forget open -a Vial',
-    # AKS Lab workspace: a dedicated Ghostty *instance* whose title is locked to
-    # "AKS Lab" (Ghostty's `--title` ignores escape sequences), running the
-    # homelab tmux cockpit, plus a Safari window on the cluster dashboard.
-    # AeroSpace can't tell two Ghostty windows apart by app id, so the title
-    # rule below routes just this one to `aks-lab`; every other Ghostty window
-    # is the daily driver and lands on `terminal`. `-na` = new instance so the
-    # `--title`/`--working-directory` args actually apply. `make new document`
-    # forces a *new* Safari window rather than a tab in the restored one.
-    '''exec-and-forget open -na Ghostty --args --title="AKS Lab" --working-directory="$HOME/Documents/gitRepos/markpadam/Kubernetes-Homelab" -e zsh -lc './aks-lab tmux; exec zsh -l' ''',
-    '''exec-and-forget osascript -e 'tell application "Safari" to make new document with properties {URL:"http://localhost:9997"}' ''',
-    # ...then pin aks-lab to a 60/40 terminal:browser width split once both
-    # windows have landed (AeroSpace has no persistent split ratio).
-    'exec-and-forget "$HOME/.config/aerospace/aks-lab-split.sh"',
 ]
 
 start-at-login = true
@@ -49,7 +36,7 @@ default-root-container-orientation = 'auto'
 
 # Five named workspaces, kept alive even when empty so the keys and the
 # SketchyBar pills always land somewhere. Bound to alt-1..alt-5 below.
-persistent-workspaces = ['desktop', 'terminal', 'browser', 'comms', 'aks-lab']
+persistent-workspaces = ['desktop', 'terminal', 'browser', 'comms', 'coding']
 
 # ── Tree normalizations ───────────────────────────────────────────────────────
 enable-normalization-flatten-containers = true
@@ -154,42 +141,24 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 
 # ── Workspace routing ────────────────────────────────────────────────────────
 # Pins each app to its workspace on login (paired with the `open -a` lines in
-# after-startup-command) and whenever a new window appears. First match wins,
-# so the Safari title rule must come before the catch-all Safari rule.
+# after-startup-command) and whenever a new window appears. First match wins.
 # Window *count* per app is the app's own restore + macOS window restoration,
 # not this. Move a window between workspaces by hand with alt-shift-<n>.
+# `coding` is left unrouted — put windows there yourself with alt-shift-5.
 
-[[on-window-detected]]  # Safari — the AKS Lab dashboard to `aks-lab`
-    # Must precede the two rules below (first match wins). Best-effort: it
-    # matches the window title *at creation*, which for a freshly-opened
-    # `make new document` window is the loading URL ("localhost:9997") before
-    # the page renders its own <title>. If the dashboard's title turns out to
-    # be something stable, tighten this to that; if a window slips through to
-    # `browser`, alt-shift-5 moves it.
-    if.app-id = 'com.apple.Safari'
-    if.window-title-regex-substring = '(?i)localhost:9997'
-    run = 'move-node-to-workspace aks-lab'
-
-[[on-window-detected]]  # Safari — everything else to `browser`
+[[on-window-detected]]  # Safari — to `browser`
     if.app-id = 'com.apple.Safari'
     run = 'move-node-to-workspace browser'
 
 [[on-window-detected]]  # Ghostty — the Hammerspoon scratchpad (Ctrl+`).
     # Float it and DON'T route it to a workspace, so the drop-down terminal
     # follows you (Hammerspoon owns its geometry + show/hide — scratchpad.lua).
-    # Must precede the two Ghostty rules below (first match wins).
+    # Must precede the Ghostty rule below (first match wins).
     if.app-id = 'com.mitchellh.ghostty'
     if.window-title-regex-substring = '(?i)scratchpad'
     run = 'layout floating'
 
-[[on-window-detected]]  # Ghostty — the AKS-Lab cockpit only. Its `--title` is
-    # locked to "AKS Lab"; this rule (app-id AND title, both must match) sends
-    # just that one to `aks-lab`. Must stay *above* the catch-all below.
-    if.app-id = 'com.mitchellh.ghostty'
-    if.window-title-regex-substring = '(?i)aks.?lab'
-    run = 'move-node-to-workspace aks-lab'
-
-[[on-window-detected]]  # Ghostty — every other window is the daily driver
+[[on-window-detected]]  # Ghostty — every window is the daily driver
     if.app-id = 'com.mitchellh.ghostty'
     run = 'move-node-to-workspace terminal'
 
@@ -238,14 +207,14 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     alt-2 = 'workspace terminal'
     alt-3 = 'workspace browser'
     alt-4 = 'workspace comms'
-    alt-5 = 'workspace aks-lab'
+    alt-5 = 'workspace coding'
 
     # Move focused window to workspace (same positional keys + shift)
     alt-shift-1 = 'move-node-to-workspace desktop'
     alt-shift-2 = 'move-node-to-workspace terminal'
     alt-shift-3 = 'move-node-to-workspace browser'
     alt-shift-4 = 'move-node-to-workspace comms'
-    alt-shift-5 = 'move-node-to-workspace aks-lab'
+    alt-shift-5 = 'move-node-to-workspace coding'
 
     # Workspace navigation
     alt-tab = 'workspace-back-and-forth'

@@ -57,7 +57,7 @@ meters; idle/normal there is `subtext`. Rounded corners (bar 8, pills 6),
 bar's own choices, not the menu's.
 
 ```
-LEFT    workspace pills (desktop terminal browser comms aks-lab)  ->  front_app
+LEFT    workspace pills (desktop terminal browser comms coding)  ->  front_app
 RIGHT   clock  battery  volume  cpu  memory
 ```
 

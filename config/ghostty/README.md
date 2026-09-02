@@ -60,11 +60,11 @@ Wired into the Hammerspoon menu (**Opt+Space → Terminal**). macOS Ghostty has
 no "new window into the running instance" from the CLI, so each is `open -na` =
 a fresh Ghostty instance — fine for on-demand tools.
 
-The **`AKS Lab`** title is load-bearing: `dotfiles/aerospace/aerospace.toml`
-routes `com.mitchellh.ghostty` windows titled `aks.?lab` to the `aks-lab`
-workspace and every other Ghostty window to `terminal` (AeroSpace can't tell
-two windows of one app apart otherwise). Ghostty's `--title` ignores title
-escape sequences, so tmux/zsh can't clobber it.
+Ghostty's `--title` is locked (it ignores title escape sequences, so tmux/zsh
+can't clobber it). Every Ghostty window routes to `terminal` except the
+`scratchpad` one, which `dotfiles/aerospace/aerospace.toml` floats by title. To
+pin another named window elsewhere, add a `window-title-regex-substring` rule
+above the catch-all Ghostty rule.
 
 ## Exec bit
 

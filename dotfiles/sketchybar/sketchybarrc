@@ -76,10 +76,10 @@ COLOR="$BAR_ACCENT"   # the active-workspace accent (matches the menu)
 # escapes so tooling that rewrites this file can't silently strip the
 # private-use codepoints. Material Design Icons range (F0000+); Hack Nerd Font
 # Mono *Regular* carries both the MD and Font Awesome ranges. Glyphs:
-#   F0379 monitor  F018D console  F059F web  F0361 message  F10FE kubernetes
-ws_name=(desktop            terminal         browser          comms          aks-lab)
-ws_label=("Desktop (1)"     "Terminal (2)"   "Browser (3)"    "Comms (4)"    "AKS Lab (5)")
-ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb1\x83\xbe')
+#   F0379 monitor  F018D console  F059F web  F0361 message  F0293 code-tags
+ws_name=(desktop            terminal         browser          comms          coding)
+ws_label=("Desktop (1)"     "Terminal (2)"   "Browser (3)"    "Comms (4)"    "Coding (5)")
+ws_icon=($'\xf3\xb0\x8d\xb9' $'\xf3\xb0\x86\x8d' $'\xf3\xb0\x96\x9f' $'\xf3\xb0\x8d\xa1' $'\xf3\xb0\x8a\x93')
 for i in "${!ws_name[@]}"; do
     n="${ws_name[$i]}"
     sketchybar --add item space."$n" left \

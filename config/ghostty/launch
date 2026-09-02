@@ -10,8 +10,9 @@
 # on-demand tools; the daily driver stays one instance.
 #
 # `--title` is locked (Ghostty ignores title escape sequences once it is set),
-# which is how dotfiles/aerospace/aerospace.toml routes the "AKS Lab" window to
-# the aks-lab workspace while every other Ghostty window goes to `terminal`.
+# so a launched window keeps its name in the SketchyBar front_app label and can
+# be targeted by an aerospace.toml window-title rule if one is ever wanted.
+# Right now every Ghostty window (bar the `scratchpad`) routes to `terminal`.
 set -euo pipefail
 
 repos="$HOME/Documents/gitRepos"
