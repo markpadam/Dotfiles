@@ -223,8 +223,11 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
     # ctrl-arrows cycle the AeroSpace workspaces (macOS's own ctrl-left/right
     # "move a Space" is a no-op here — Mission Control is one Space per display).
-    ctrl-left  = 'workspace --wrap-around prev'
-    ctrl-right = 'workspace --wrap-around next'
+    # Via the ws-cycle wrapper, NOT `workspace next|prev`: the built-in walks
+    # workspaces alphabetically (browser, coding, comms, desktop, terminal),
+    # ws-cycle walks them in the positional alt-1..alt-5 order instead.
+    ctrl-left  = 'exec-and-forget $HOME/.config/aerospace/ws-cycle prev'
+    ctrl-right = 'exec-and-forget $HOME/.config/aerospace/ws-cycle next'
 
     # Window
     alt-q     = 'close'

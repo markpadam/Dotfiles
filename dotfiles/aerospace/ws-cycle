@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Cycle AeroSpace workspaces in the *named* order — the one on alt-1..alt-5 and
+# the SketchyBar pills (desktop, terminal, browser, comms, coding).
+#
+# AeroSpace's built-in `workspace next|prev` walks workspaces in the order
+# `list-workspaces --all` prints them, which is alphabetical:
+#   browser, coding, comms, desktop, terminal
+# so ctrl-left / ctrl-right felt out of order. This wrapper keeps the walk in
+# the positional order instead. Bound to ctrl-left / ctrl-right in
+# aerospace.toml.
+#
+#   ws-cycle next   → one workspace to the right, wrapping past the end
+#   ws-cycle prev   → one workspace to the left,  wrapping past the start
+set -euo pipefail
+
+# Keep in sync with persistent-workspaces / alt-1..alt-5 in aerospace.toml.
+order=(desktop terminal browser comms coding)
+
+current=$(aerospace list-workspaces --focused)
+
+idx=-1
+for i in "${!order[@]}"; do
+    if [[ "${order[$i]}" == "$current" ]]; then idx=$i; break; fi
+done
+
+# Focused workspace isn't in the list (shouldn't happen) — jump to the first.
+if (( idx < 0 )); then
+    aerospace workspace "${order[0]}"
+    exit 0
+fi
+
+n=${#order[@]}
+case "${1:-next}" in
+    next) target=$(( (idx + 1) % n )) ;;
+    prev) target=$(( (idx - 1 + n) % n )) ;;
+    *)    echo "usage: ws-cycle {next|prev}" >&2; exit 2 ;;
+esac
+
+aerospace workspace "${order[$target]}"

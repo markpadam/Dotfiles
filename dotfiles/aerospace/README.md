@@ -49,7 +49,15 @@ Five, named, on `alt-1`..`alt-5` (positional):
 
 `persistent-workspaces` (top of the file) keeps all five alive when empty so
 the keys and the SketchyBar pills always land somewhere. `alt-shift-<n>` moves
-the focused window. SketchyBar draws a pill per workspace (icon + label — the
+the focused window.
+
+`ctrl-left` / `ctrl-right` step through the workspaces one at a time (wrapping
+at the ends). They run the **`ws-cycle`** script here rather than AeroSpace's
+`workspace next|prev`, because the built-in walks workspaces in the order
+`list-workspaces --all` prints them — alphabetical: `browser, coding, comms,
+desktop, terminal` — which is not the `alt-1..alt-5` order. `ws-cycle` hard-codes
+the positional order (`desktop terminal browser comms coding`); keep that list
+in sync with `persistent-workspaces` if the workspaces ever change. SketchyBar draws a pill per workspace (icon + label — the
 label is the workspace name with its `alt`-key number in brackets, e.g.
 `terminal (2)`, `coding (5)`); a click runs `aerospace workspace <name>`. The
 bracketed number is cosmetic — `ws_label` in `sketchybarrc`, not the AeroSpace
