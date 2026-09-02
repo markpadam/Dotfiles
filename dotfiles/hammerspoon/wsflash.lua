@@ -1,23 +1,69 @@
--- wsflash.lua — a brief centre overlay with the workspace name on a switch
--- (Hyprland shows one; the SketchyBar pills highlight, but a flash reads
--- faster). AeroSpace's exec-on-workspace-change writes the name to
+-- wsflash.lua — reacts to an AeroSpace workspace switch:
+--   • a brief centre overlay with the workspace name (Hyprland-style)
+--   • a per-workspace wallpaper from ~/Pictures/Wallpapers
+-- AeroSpace's exec-on-workspace-change writes the name to
 -- ~/.cache/omachy/workspace; we pathwatch that file.
 --
 --   require("wsflash").start()
+--
+-- Per-workspace wallpaper: each workspace gets a fixed image from
+-- ~/Pictures/Wallpapers (by name hash, so it's stable), or set M.wallpaperMap
+-- = { coding = "koi.jpg", … } to pin specific ones. Turn OFF macOS's own
+-- wallpaper auto-rotate or it'll cycle out from under this. M.wallpaper = false
+-- to disable.
 
 local ui    = require("ui")
 local theme = require("theme")
 
 local M = {}
+M.wallpaper     = true
+M.wallpaperMap  = {}      -- { <workspace> = "<file in ~/Pictures/Wallpapers>" }
+
 local HOME = os.getenv("HOME")
 local FILE = HOME .. "/.cache/omachy/workspace"
+local WPDIR = HOME .. "/Pictures/Wallpapers"
 
 local GLYPH = {
   desktop  = "\u{f108}", terminal = "\u{f120}", browser = "\u{f0ac}",
   comms    = "\u{f086}", coding   = "\u{f121}",
 }
 
-local canvas, watcher, hideTimer, last
+local canvas, watcher, hideTimer, last, wpList
+
+-- ── per-workspace wallpaper ───────────────────────────────────────────────
+local function wallpapers()
+  if wpList then return wpList end
+  wpList = {}
+  local ok, iter, d = pcall(hs.fs.dir, WPDIR)
+  if ok then
+    for f in iter, d do
+      if f:match("%.[jJ][pP][eE]?[gG]$") or f:match("%.[pP][nN][gG]$") or f:match("%.[hH][eE][iI][cC]$") then
+        wpList[#wpList + 1] = WPDIR .. "/" .. f
+      end
+    end
+  end
+  table.sort(wpList)
+  return wpList
+end
+
+local function wallpaperFor(name)
+  local m = M.wallpaperMap[name]
+  if m then return WPDIR .. "/" .. m end
+  local list = wallpapers()
+  if #list == 0 then return nil end
+  local h = 5381
+  for i = 1, #name do h = (h * 33 + name:byte(i)) % 2147483647 end
+  return list[(h % #list) + 1]
+end
+
+local function setWallpaper(name)
+  if not M.wallpaper then return end
+  local p = wallpaperFor(name)
+  if p and hs.fs.attributes(p) then
+    hs.osascript.applescript(
+      ('tell application "System Events" to tell every desktop to set picture to %q'):format(p))
+  end
+end
 
 local function flash(name)
   local c = theme.current()
@@ -45,7 +91,11 @@ end
 local function onChange()
   local f = io.open(FILE, "r"); if not f then return end
   local name = (f:read("*l") or ""):gsub("%s+", ""); f:close()
-  if name ~= "" and name ~= last then last = name; flash(name) end
+  if name ~= "" and name ~= last then
+    last = name
+    flash(name)
+    setWallpaper(name)
+  end
 end
 
 function M.start()

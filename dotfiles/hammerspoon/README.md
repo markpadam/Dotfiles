@@ -43,14 +43,17 @@ services.lua    brew-update count, now-playing, screen recording, window flash
 whichkey.lua    hold ⌥ → cheatsheet (macOS / Hammerspoon / AeroSpace / nvim / tmux)
 switcher.lua    themed Cmd+Tab (menu-style list; needs the Karabiner remap)
 dock.lua        themed left-edge dock — the macOS one can't be re-coloured
-wsflash.lua     centre flash of the workspace name on switch (Hyprland-style)
+wsflash.lua     on workspace switch: name-flash + a per-workspace wallpaper
 pickers.lua     audio / Bluetooth / Wi-Fi / SSH pickers for the menu
 webapp.lua      lists Safari 'Add to Dock' apps; syncs the home dashboard
 emoji.lua       emoji + Nerd-Font-glyph picker
 ```
 
-`wsflash.lua` reads `~/.cache/omachy/workspace`, which `aerospace.toml`'s
-`exec-on-workspace-change` writes. `webapp.lua` is a launcher only — you make/remove web apps in Safari ▸ File ▸
+`wsflash.lua` reads `~/.cache/omachy/workspace` (written by `aerospace.toml`'s
+`exec-on-workspace-change`) and, on a change, flashes the name and sets a
+per-workspace wallpaper from `~/Pictures/Wallpapers` (stable by name hash, or
+pin with `M.wallpaperMap`; turn off macOS wallpaper auto-rotate). `M.wallpaper
+= false` disables it. `webapp.lua` is a launcher only — you make/remove web apps in Safari ▸ File ▸
 Add to Dock. The menu lists every `com.apple.Safari.WebApp.*` in `~/Applications`
 plus a **Home Dashboard** submenu (auto-synced from the dashboard's
 `/api/services`; a service opens as its Safari app if you've made one, else a
