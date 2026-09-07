@@ -91,7 +91,11 @@ local function draw()
     canvas:mouseCallback(function(_, msg, id)
       if msg == "mouseUp" and type(id) == "string" then
         local i = tonumber(id:match("^app(%d+)$"))
-        if i and list[i] then hs.application.launchOrFocusByBundleID(list[i].bid) end
+        if i and list[i] then
+          hs.application.launchOrFocusByBundleID(list[i].bid)
+          pinnedOpen, armedForClose = false, false
+          M.hide()
+        end
       end
     end)
   end
