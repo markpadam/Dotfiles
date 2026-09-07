@@ -22,7 +22,7 @@ M.pinned = {
   "com.microsoft.VSCode",
   "com.anthropic.claudefordesktop",
   "com.apple.mail",
-  "net.whatsapp.WhatsApp",
+  "com.automattic.beeper.desktop",
   "com.apple.iCal",
   "com.apple.Notes",
   "com.apple.systempreferences",

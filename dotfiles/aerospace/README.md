@@ -41,11 +41,11 @@ Five, named, on `alt-1`..`alt-5` (positional):
 
 | key | workspace | for |
 |-----|-----------|-----|
-| `alt-1` | `desktop`  | nothing pinned — a clear space (also where Vial lands) |
+| `alt-1` | `desktop`  | nothing pinned — a clear scratch space |
 | `alt-2` | `terminal` | Ghostty |
 | `alt-3` | `browser`  | Safari |
-| `alt-4` | `comms`    | Mail, WhatsApp |
-| `alt-5` | `coding`   | unrouted — put coding windows here with `alt-shift-5` |
+| `alt-4` | `comms`    | Mail, Beeper |
+| `alt-5` | `coding`   | Visual Studio Code |
 
 `persistent-workspaces` (top of the file) keeps all five alive when empty so
 the keys and the SketchyBar pills always land somewhere. `alt-shift-<n>` moves
@@ -69,19 +69,19 @@ There is no snapshot/restore — instead the layout is *rebuilt* on each login
 from two halves:
 
 - **`after-startup-command`** `open -a`s the workspace apps (Ghostty, Safari,
-  Mail, WhatsApp, Vial). How many windows each brings back is the app's own
-  restore setting plus the macOS "reopen windows when logging back in" box —
-  for Safari, Settings → General → *"Safari opens with: All windows from last
-  session"*.
+  Mail, Beeper, Visual Studio Code). How many windows each brings back is the
+  app's own restore setting plus the macOS "reopen windows when logging back
+  in" box — for Safari, Settings → General → *"Safari opens with: All windows
+  from last session"*.
 - **`on-window-detected` "Workspace routing"** rules pin each app to a
   workspace as its windows appear: Ghostty → `terminal`, Safari → `browser`,
-  Mail / WhatsApp → `comms`, Vial → `desktop`.
+  Mail / Beeper → `comms`, Visual Studio Code → `coding`.
 
 Caveats: one app routes to one workspace. Split ratios and left/right ordering
-within a workspace are not restored; AeroSpace re-tiles fresh. `desktop` and
-`coding` are deliberately unrouted — clear scratch spaces. To send a named
-Ghostty window somewhere other than `terminal`, give it a distinct locked
-title (`config/ghostty/launch`) and add a `window-title-regex-substring` rule
+within a workspace are not restored; AeroSpace re-tiles fresh. `desktop` is
+deliberately unrouted — a clear scratch space. To send a named Ghostty window
+somewhere other than `terminal`, give it a distinct locked title
+(`config/ghostty/launch`) and add a `window-title-regex-substring` rule
 *above* the catch-all Ghostty rule.
 
 ### Startup command

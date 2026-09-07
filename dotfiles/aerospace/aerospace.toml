@@ -22,8 +22,8 @@ after-startup-command = [
     'exec-and-forget open -a Ghostty',
     'exec-and-forget open -a Safari',
     'exec-and-forget open -a Mail',
-    'exec-and-forget open -a WhatsApp',
-    'exec-and-forget open -a Vial',
+    'exec-and-forget open -a Beeper',
+    'exec-and-forget open -a "Visual Studio Code"',
 ]
 
 start-at-login = true
@@ -146,7 +146,7 @@ exec-on-workspace-change = ['/bin/bash', '-c',
 # after-startup-command) and whenever a new window appears. First match wins.
 # Window *count* per app is the app's own restore + macOS window restoration,
 # not this. Move a window between workspaces by hand with alt-shift-<n>.
-# `coding` is left unrouted — put windows there yourself with alt-shift-5.
+# `desktop` is left unrouted — put windows there yourself with alt-shift-1.
 
 [[on-window-detected]]  # Safari — to `browser`
     if.app-id = 'com.apple.Safari'
@@ -168,13 +168,13 @@ exec-on-workspace-change = ['/bin/bash', '-c',
     if.app-id = 'com.apple.mail'
     run = 'move-node-to-workspace comms'
 
-[[on-window-detected]]  # WhatsApp
-    if.app-id = 'net.whatsapp.WhatsApp'
+[[on-window-detected]]  # Beeper — to `comms` (multi-messenger; replaced WhatsApp here 2026-09-07)
+    if.app-id = 'com.automattic.beeper.desktop'
     run = 'move-node-to-workspace comms'
 
-[[on-window-detected]]  # Vial (keyboard config)
-    if.app-id = 'today.vial'
-    run = 'move-node-to-workspace desktop'
+[[on-window-detected]]  # Visual Studio Code — to `coding`
+    if.app-id = 'com.microsoft.VSCode'
+    run = 'move-node-to-workspace coding'
 
 # ── Main keybindings (Omachy guide — https://omachy.org/guide.html) ──────────
 # Follows the Omachy AeroSpace bindings, EXCEPT the workspaces below are named &

@@ -116,7 +116,7 @@ local CUSTOM_APPS = { title = "Custom Apps", g = NF.custom, items = {
   { name = "NordVPN",        app = "com.nordvpn.macos",               action = focusID("com.nordvpn.macos") },
   { name = "Screens",        app = "com.edovia.screens.5",            action = focusID("com.edovia.screens.5") },
   { name = "Windows App",    app = "com.microsoft.rdc.macos",         action = focusID("com.microsoft.rdc.macos") },
-  { name = "WhatsApp",       app = "net.whatsapp.WhatsApp",           action = focusID("net.whatsapp.WhatsApp") },
+  { name = "Beeper",         app = "com.automattic.beeper.desktop",   action = focusID("com.automattic.beeper.desktop") },
   { name = "Zoom",           app = "us.zoom.xos",                     action = focusID("us.zoom.xos") },
   { name = "Vial",           app = "today.vial",                      action = focusID("today.vial") },
 } }
