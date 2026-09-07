@@ -1,5 +1,5 @@
 -- wsflash.lua — reacts to an AeroSpace workspace switch:
---   • a brief centre overlay with the workspace name (Hyprland-style)
+--   • a brief overlay near the bottom of the screen with the workspace name
 --   • a per-workspace wallpaper from ~/Pictures/Wallpapers
 -- AeroSpace's exec-on-workspace-change writes the name to
 -- ~/.cache/omachy/workspace; we pathwatch that file.
@@ -29,6 +29,10 @@ local GLYPH = {
 }
 
 local canvas, watcher, hideTimer, last, wpList
+
+local W, H       = 260, 116            -- flash box size
+local BOTTOM_GAP = 46                  -- breathing room from the screen's bottom edge
+local SHOW, HOLD, HIDE = 0, 0.5, 0.12  -- fade-in / linger / fade-out, seconds — snappy
 
 -- ── per-workspace wallpaper ───────────────────────────────────────────────
 local function wallpapers()
@@ -67,10 +71,9 @@ end
 
 local function flash(name)
   local c = theme.current()
-  local W, H = 260, 116
-  canvas = canvas or ui.centred(W, H, 0.42)
+  canvas = canvas or ui.centred(W, H)
   local scr = hs.screen.mainScreen():frame()
-  canvas:frame({ x = scr.x + (scr.w - W) / 2, y = scr.y + (scr.h - H) * 0.42, w = W, h = H })
+  canvas:frame({ x = scr.x + (scr.w - W) / 2, y = scr.y + scr.h - H - BOTTOM_GAP, w = W, h = H })
 
   local els = {
     { type = "rectangle", action = "fill", fillColor = { hex = c.base, alpha = 0.96 },
@@ -83,9 +86,9 @@ local function flash(name)
       { frame = { x = 0, y = 70, w = W, h = 22 }, textAlignment = "center" }),
   }
   canvas:replaceElements(els)
-  canvas:show(0.08)
+  canvas:show(SHOW)
   if hideTimer then hideTimer:stop() end
-  hideTimer = hs.timer.doAfter(0.75, function() if canvas then canvas:hide(0.25) end end)
+  hideTimer = hs.timer.doAfter(HOLD, function() if canvas then canvas:hide(HIDE) end end)
 end
 
 local function onChange()

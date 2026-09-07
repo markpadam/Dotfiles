@@ -50,7 +50,9 @@ emoji.lua       emoji + Nerd-Font-glyph picker
 ```
 
 `wsflash.lua` reads `~/.cache/omachy/workspace` (written by `aerospace.toml`'s
-`exec-on-workspace-change`) and, on a change, flashes the name and sets a
+`exec-on-workspace-change`) and, on a change, flashes the name in a small box
+near the bottom-centre of the screen (instant in, ~0.5s linger, quick fade —
+tune `SHOW`/`HOLD`/`HIDE` and `BOTTOM_GAP` near the top of the file) and sets a
 per-workspace wallpaper from `~/Pictures/Wallpapers` (stable by name hash, or
 pin with `M.wallpaperMap`; turn off macOS wallpaper auto-rotate). `M.wallpaper
 = false` disables it. `webapp.lua` is a launcher only — you make/remove web apps in Safari ▸ File ▸
