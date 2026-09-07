@@ -3,8 +3,9 @@
 -- An hs.canvas strip on the left edge (matching the `orientation left` the
 -- native Dock was set to): pinned apps + anything else running, each with a
 -- running dot, click to launch or focus. Auto-hides; slide the mouse to the
--- left edge — or hold Ctrl — to bring it back. Colours come from theme.lua and
--- re-skin on a theme change. The native Dock is parked while this runs.
+-- left edge to bring it back, or hold Ctrl (~0.3s) to pin it open until a
+-- clean tap of Ctrl closes it again. Colours come from theme.lua and re-skin
+-- on a theme change. The native Dock is parked while this runs.
 --
 --   require("dock").start()
 --   require("dock").edge = "bottom"   -- before start(), if you prefer
@@ -31,7 +32,8 @@ M.pinned = {
 local GAP, PAD, DOT, RADIUS, MARGIN = 8, 8, 5, 12, 6
 local canvas, poll, appWatcher, screenWatcher, hideTimer
 local flagsTap, ctrlKeyTap, ctrlArmTimer
-local shown, list, iconCache, dockParked, ctrlHold
+local shown, list, iconCache, dockParked
+local pinnedOpen, armedForClose, ctrlChorded
 
 -- ── app list ──────────────────────────────────────────────────────────────
 local function icon(bid)
@@ -157,13 +159,15 @@ local function tick()
   end
   local overPanel = shown and m.x >= f.x - 4 and m.x <= f.x + f.w + 4
     and m.y >= f.y - 4 and m.y <= f.y + f.h + 4
-  if (nearEdge or overPanel or ctrlHold) then M.reveal()
+  if (nearEdge or overPanel or pinnedOpen) then M.reveal()
   elseif shown then scheduleHide() end
 end
 
--- ── hold Ctrl to show ─────────────────────────────────────────────────────
--- A key pressed within the arm window is "Ctrl + <key>", so cancel.
+-- ── hold Ctrl to pin open / clean-tap Ctrl to close ───────────────────────
+-- A key pressed while Ctrl is down makes it a chord (Ctrl+<key>), not a hold
+-- or a tap — flag it so it neither pins nor closes the dock.
 local function onCtrlKey()
+  ctrlChorded = true
   if ctrlArmTimer then ctrlArmTimer:stop(); ctrlArmTimer = nil end
   if ctrlKeyTap then ctrlKeyTap:stop() end
   return false
@@ -172,22 +176,39 @@ end
 local function onFlags(e)
   local f = e:getFlags()
   local onlyCtrl = f.ctrl and not (f.cmd or f.alt or f.shift)
+
   if onlyCtrl then
-    if not ctrlHold and not ctrlArmTimer then
+    -- Ctrl went down on its own
+    ctrlChorded = false
+    if pinnedOpen then
+      -- watch this press: a clean tap (Ctrl up, no other key) closes the dock
+      if armedForClose and ctrlKeyTap then ctrlKeyTap:start() end
+    elseif not ctrlArmTimer then
+      -- hold Ctrl alone for 0.3s to pin the dock open
       ctrlKeyTap:start()
       ctrlArmTimer = hs.timer.doAfter(0.3, function()
         ctrlArmTimer = nil
         if ctrlKeyTap then ctrlKeyTap:stop() end
-        if hs.eventtap.checkKeyboardModifiers().ctrl then
-          ctrlHold = true
+        if hs.eventtap.checkKeyboardModifiers().ctrl and not ctrlChorded then
+          pinnedOpen, armedForClose = true, false
           M.reveal()
         end
       end)
     end
-  else
+  elseif not f.ctrl then
+    -- Ctrl fully released
     if ctrlArmTimer then ctrlArmTimer:stop(); ctrlArmTimer = nil end
     if ctrlKeyTap then ctrlKeyTap:stop() end
-    if ctrlHold then ctrlHold = false; scheduleHide() end
+    if pinnedOpen then
+      if armedForClose and not ctrlChorded then
+        pinnedOpen = false
+        M.hide()
+      else
+        -- the release of the opening hold (or a chord) — keep it pinned;
+        -- a later clean tap of Ctrl can now close it
+        armedForClose = true
+      end
+    end
   end
   return false
 end
@@ -245,7 +266,7 @@ function M.stop()
   if ctrlArmTimer then ctrlArmTimer:stop(); ctrlArmTimer = nil end
   poll, flagsTap, ctrlKeyTap = nil, nil, nil
   if canvas then canvas:delete(); canvas = nil end
-  shown, ctrlHold = false, false
+  shown, pinnedOpen, armedForClose = false, false, false
   parkNativeDock(false)
 end
 

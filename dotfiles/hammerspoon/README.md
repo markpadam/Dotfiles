@@ -86,7 +86,10 @@ Reload: `hs -c 'hs.reload()'`. **`hs -c` hangs on canvas/eventtap code** — use
 A themed `hs.canvas` strip on the left edge (matching the `orientation left` the
 native Dock had): pinned apps + everything else running, a mauve dot under the
 running ones, click to launch or focus. Auto-hides; mouse to the far-left edge
-to bring it back. Re-skins on a theme change. On start it parks the native Dock
+to bring it back for as long as the pointer stays there, or **hold Ctrl (~0.3s)
+to pin it open** — it then stays until a **clean tap of Ctrl** (Ctrl down/up with
+no other key) closes it again; Ctrl chords (Ctrl+C, Ctrl+arrow, …) are ignored.
+Re-skins on a theme change. On start it parks the native Dock
 (`autohide-delay 1000`); `require("dock").stop()` restores it. Edit `M.pinned`
 at the top of the file; `M.edge = "bottom"` before `start()` for a bottom dock.
 
